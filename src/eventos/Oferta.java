@@ -28,7 +28,11 @@ public final class Oferta {
             throw new IllegalArgumentException("La fecha/hora fin debe ser posterior o igual a inicio.");
         }
     }
-
+    public Oferta(String idLocalidad, String nombre, double precioBase, boolean numerada,Localidad localidad, Evento evento) {
+    	this(localidad, evento, 0.0, LocalDateTime.MIN, LocalDateTime.MAX);
+}
+    
+    
     public boolean activa(LocalDateTime now) {
         return (now.equals(inicio) || now.isAfter(inicio))
             && (now.equals(fin)    || now.isBefore(fin));

@@ -30,6 +30,7 @@ public class Organizador extends Usuario {
         }
     }
     
+    
     public List<Tiquete> getCortesias() {
         return new ArrayList<>(cortesias);
     }

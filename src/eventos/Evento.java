@@ -138,11 +138,12 @@ public class Evento {
     	} 
     }
     
-    public double getPorcentajeVenta(){
-    	int capacidad = getCapacidadMaxima();
+    public double getPorcentajeVenta() {
+        int capacidad = getCapacidadMaxima();
         if (capacidad <= 0) return 0.0;
-        return (getVendidos() * 100.0) / capacidad;
+        return (getVendidos() * 100.0) / capacidad;
     }
+
 
     public void setTiquetes(ArrayList<Tiquete> tiquetes) {
         this.tiquetes.clear();

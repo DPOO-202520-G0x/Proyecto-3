@@ -1,3 +1,11 @@
+package tiquetes;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 public class PaqueteDeluxe extends PaqueteTiquetes {
     private  List<String> beneficios = new ArrayList<>();
     private  List<Tiquete> cortesias = new ArrayList<>(); 
