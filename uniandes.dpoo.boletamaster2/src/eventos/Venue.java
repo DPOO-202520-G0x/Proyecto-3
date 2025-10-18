@@ -13,7 +13,7 @@ public class Venue {
     private final List<Localidad> localidades;
     private final List<Evento> eventosProgramados;
 
-    public Venue(String idVenue, String nombre, String ubicacion, int capacidad, ArrayList<Localidad> localidades) {
+    public Venue(String idVenue, String nombre, String ubicacion, int capacidadMaxima, ArrayList<Localidad> localidades) {
         this.idVenue = Objects.requireNonNull(idVenue, "El identificador del venue es obligatorio");
         this.nombre = Objects.requireNonNull(nombre, "El nombre del venue es obligatorio");
         this.ubicacion = Objects.requireNonNull(ubicacion, "La ubicación es obligatoria");

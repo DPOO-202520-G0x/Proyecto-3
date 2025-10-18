@@ -18,6 +18,7 @@ public class Organizador extends Usuario {
     private final String idOrganizador;
     private double finanzas;
     private final List<Evento> eventos;
+    private final List<Tiquete> cortesias = new ArrayList<>();
 
     public Organizador(String login, String password, String nombre, double saldo, String idOrganizador,
             ArrayList<Evento> eventos) {
@@ -27,6 +28,15 @@ public class Organizador extends Usuario {
         if (eventos != null) {
             this.eventos.addAll(eventos);
         }
+    }
+    
+    public List<Tiquete> getCortesias() {
+        return new ArrayList<>(cortesias);
+    }
+    
+    public boolean agregarCortesia(Tiquete t) {
+        if (t == null) return false;
+        return cortesias.add(t);
     }
 
     public double getFinanzas() {

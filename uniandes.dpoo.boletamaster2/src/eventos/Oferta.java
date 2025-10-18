@@ -1,59 +1,62 @@
 package eventos;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
 
+public final class Oferta {
 
-public class Oferta {
-	private String idLocalidad;
-	private String nombre;
-	private double precioBase;
-	private boolean numerada;
-	private Localidad localidad;
-	private Evento evento;
-	
-	public Oferta(String idLocalidad, String nombre, double precioBase, boolean numerada, Localidad localidad, Evento evento) {
-		super();
-		this.idLocalidad = idLocalidad;
-		this.nombre = nombre;
-		this.precioBase = precioBase;
-		this.numerada = numerada;
-		this.localidad = localidad;
-		this.evento=evento;
-	}
-	public Evento getEvento() {
-		return evento;
-	}
-	public void setEvento(Evento evento) {
-		this.evento = evento;
-	}
-	public String getIdLocalidad() {
-		return idLocalidad;
-	}
-	public void setIdLocalidad(String idLocalidad) {
-		this.idLocalidad = idLocalidad;
-	}
-	public String getNombre() {
-		return nombre;
-	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	public double getPrecioBase() {
-		return precioBase;
-	}
-	public void setPrecioBase(double precioBase) {
-		this.precioBase = precioBase;
-	}
-	public boolean isNumerada() {
-		return numerada;
-	}
-	public void setNumerada(boolean numerada) {
-		this.numerada = numerada;
-	}
-	public Localidad getLocalidad() {
-		return localidad;
-	}
-	public void setLocalidad(Localidad localidad) {
-		this.localidad = localidad;
-	}
-	
+    private final Localidad localidad;
+    private final Evento evento;
+    private final double porcentaje;          // 0..100 (ej. 10 = 10%)
+    private final LocalDateTime inicio;       
+    private final LocalDateTime fin;          
+
+    public Oferta(Localidad localidad,
+                  Evento evento,
+                  double porcentaje,          // 0..100
+                  LocalDateTime inicio,
+                  LocalDateTime fin) {
+        this.localidad = Objects.requireNonNull(localidad, "La localidad es obligatoria");
+        this.evento    = Objects.requireNonNull(evento, "El evento es obligatorio");
+        if (porcentaje < 0.0 || porcentaje > 100.0) {
+            throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100 (ej. 10 = 10%).");
+        }
+        this.porcentaje = porcentaje;
+        this.inicio     = Objects.requireNonNull(inicio, "La fecha/hora de inicio es obligatoria");
+        this.fin        = Objects.requireNonNull(fin, "La fecha/hora de fin es obligatoria");
+        if (fin.isBefore(inicio)) {
+            throw new IllegalArgumentException("La fecha/hora fin debe ser posterior o igual a inicio.");
+        }
+    }
+
+    public boolean activa(LocalDateTime now) {
+        return (now.equals(inicio) || now.isAfter(inicio))
+            && (now.equals(fin)    || now.isBefore(fin));
+    }
+
+    public double aplicar(double precioBase, LocalDateTime now) {
+        if (!activa(now)) return precioBase;
+        double factor = 1.0 - (porcentaje / 100.0);
+        return precioBase * factor;
+    }
+
+    public Localidad getLocalidad() 
+    { return localidad; 
+    }
+    
+    public Evento getEvento()       
+    { return evento; 
+    }
+    
+    public double getPorcentaje()   
+    { return porcentaje; 
+    }
+    
+    public LocalDateTime getInicio()
+    { return inicio; 
+    }
+    
+    public LocalDateTime getFin()   
+    { return fin; 
+    }
 }

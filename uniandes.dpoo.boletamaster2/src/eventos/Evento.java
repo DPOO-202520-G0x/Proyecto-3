@@ -125,6 +125,24 @@ public class Evento {
     public ArrayList<Tiquete> getTiquetes() {
         return new ArrayList<>(tiquetes);
     }
+    
+    public int getVendidos() {
+    	return tiquetes.size();
+    }
+    
+    public int getCapacidadMaxima() {
+    	if (venue == null) {
+    	    return 0;
+    	} else {
+    	    return venue.getCapacidadMaxima();
+    	} 
+    }
+    
+    public double getPorcentajeVenta(){
+    	int capacidad = getCapacidadMaxima();
+        if (capacidad <= 0) return 0.0;
+        return (getVendidos() * 100.0) / capacidad;
+    }
 
     public void setTiquetes(ArrayList<Tiquete> tiquetes) {
         this.tiquetes.clear();
