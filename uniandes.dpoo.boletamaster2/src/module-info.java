@@ -4,6 +4,5 @@
 /**
  * 
  */
-module Boleteria {
-	requires java.sql;
+module boletamaster {
 }

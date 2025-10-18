@@ -1,31 +1,29 @@
-package tiquetes;
+public class PaqueteDeluxe extends PaqueteTiquetes {
+    private  List<String> beneficios = new ArrayList<>();
+    private  List<Tiquete> cortesias = new ArrayList<>(); 
 
-import java.util.ArrayList;
+    public PaqueteDeluxe(Collection<String> beneficiosIniciales,
+                         Collection<Tiquete> tiquetesIncluidosIniciales) {
+        super(false); 
+        if (beneficiosIniciales != null) beneficios.addAll(beneficiosIniciales);
+        if (tiquetesIncluidosIniciales != null) {
+            for (Tiquete t : tiquetesIncluidosIniciales) super.agregarTiquete(t);
+        }
+    }
 
-import eventos.Evento;
-import eventos.Localidad;
+    public List<String> getBeneficios() { return Collections.unmodifiableList(beneficios); }
+    public void agregarBeneficio(String b) { beneficios.add(Objects.requireNonNull(b)); }
 
-public class PaqueteDeluxe extends PaqueteTiquetes{
-	private String beneficios;
-	private ArrayList<Tiquete> tiquetesIncluidos;
-	public PaqueteDeluxe(String beneficios, ArrayList<Tiquete> tiquetesIncluidos) {
-		super();
-		this.beneficios = beneficios;
-		this.tiquetesIncluidos = tiquetesIncluidos;
-	}
-	public String getBeneficios() {
-		return beneficios;
-	}
-	public void setBeneficios(String beneficios) {
-		this.beneficios = beneficios;
-	}
-	public ArrayList<Tiquete> getTiquetesIncluidos() {
-		return tiquetesIncluidos;
-	}
-	public void setTiquetesIncluidos(ArrayList<Tiquete> tiquetesIncluidos) {
-		this.tiquetesIncluidos = tiquetesIncluidos;
-	}
-	public void agregarTiquetes(ArrayList<Tiquete> tiquetes) {
-		tiquetesIncluidos.addAll(tiquetes);
-	}
+    public List<Tiquete> getCortesias() { return Collections.unmodifiableList(cortesias); }
+    public void agregarCortesia(Tiquete t) { cortesias.add(Objects.requireNonNull(t)); }
+
+    public List<Tiquete> todosLosAccesos() {
+        List<Tiquete> all = new ArrayList<>(getTiquetes());
+        all.addAll(cortesias);
+        return Collections.unmodifiableList(all);
+    }
+
+    @Override public void agregarTiquete(Tiquete tiquete) {
+        super.agregarTiquete(tiquete);
+    }
 }
