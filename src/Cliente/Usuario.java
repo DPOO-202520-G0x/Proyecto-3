@@ -46,7 +46,7 @@ public abstract class Usuario {
         return saldo;
     }
 
-    protected void setSaldo(double saldo) {
+   public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
 
@@ -74,4 +74,5 @@ public abstract class Usuario {
         }
         saldo -= monto;
     }
+
 }
