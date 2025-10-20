@@ -10,12 +10,28 @@ import Cliente.Administrador;
 import Cliente.Organizador;
 import tiquetes.Tiquete;
 
+
+/**
+ * Representa un evento publicado en la plataforma BoletaMaster.
+ * <p>
+ * Un evento pertenece a un {@link Cliente.Organizador}, se realiza en un {@link eventos.Venue}
+ * (que debe estar aprobado por el administrador) y puede tener una {@link eventos.Oferta}
+ * y múltiples {@link tiquetes.Tiquete} vendidos/asignados.
+ * <p>
+ * Reglas de dominio relevantes:
+ * <ul>
+ *   <li>Un evento siempre tiene organizador y un venue asociado.</li>
+ *   <li>Un venue no puede tener dos eventos el mismo día.</li>
+ *   <li>Las localidades y precios se definen por evento (no son inherentes al venue).</li>
+ *   <li>El porcentaje de venta del evento se puede calcular con base en la capacidad del venue.</li>
+ * </ul>
+ */
 public class Evento {
     private Administrador administrador;
     private String idEvento;
     private String nombre;
-    private LocalDate fecha; // TODO: confirmar tipo de fecha/hora según PDF/UML.
-    private LocalTime hora; // TODO: confirmar tipo de fecha/hora según PDF/UML.
+    private LocalDate fecha; 
+    private LocalTime hora; 
     private String estado;
     private TipoEvento tipoEvento;
     private Venue venue;
@@ -23,6 +39,25 @@ public class Evento {
     private Organizador organizador;
     private final List<Tiquete> tiquetes;
 
+    /**
+     * Crea un evento con todos sus datos principales y colecciones iniciales.
+     *
+     * @param administrador administrador a cargo/relacionado (obligatorio).
+     * @param idEvento      identificador único del evento (obligatorio).
+     * @param nombre        nombre del evento (obligatorio).
+     * @param fecha         fecha del evento (obligatoria).
+     * @param hora          hora del evento (obligatoria).
+     * @param estado        estado inicial del evento (obligatorio).
+     * @param tipoEvento    tipo del evento (obligatorio).
+     * @param venue         venue donde se realizará el evento (puede ser {@code null} si se asociará después).
+     * @param oferta        oferta inicial asociada al evento (opcional).
+     * @param organizador   organizador del evento (puede ser {@code null} si se setea luego).
+     * @param tiquetes      lista inicial de tiquetes (opcional; se copia si no es {@code null}).
+     *
+     * @throws NullPointerException si cualquiera de: {@code administrador}, {@code idEvento},
+     *                              {@code nombre}, {@code fecha}, {@code hora}, {@code estado} o
+     *                              {@code tipoEvento} es {@code null}.
+     */
     public Evento(Administrador administrador, String idEvento, String nombre, LocalDate fecha, LocalTime hora,
             String estado, TipoEvento tipoEvento, Venue venue, Oferta oferta, Organizador organizador,
             ArrayList<Tiquete> tiquetes) {
@@ -151,15 +186,35 @@ public class Evento {
             this.tiquetes.addAll(tiquetes);
         }
     }
-
+    /**
+     * Registra (agrega) un {@link tiquetes.Tiquete} al evento.
+     *
+     * @param tiquete tiquete a registrar (obligatorio).
+     * @throws NullPointerException si {@code tiquete} es {@code null}.
+     */
     public void registrarTiquete(Tiquete tiquete) {
         tiquetes.add(Objects.requireNonNull(tiquete, "El tiquete es obligatorio"));
     }
-
+    /**
+     * Asocia un {@link eventos.Venue} al evento.
+     * <p>
+     * No valida aquí reglas de aprobación o disponibilidad; se asume
+     * que dichas verificaciones se realizan en una capa superior.
+     *
+     * @param Venue venue a asociar (puede ser {@code null} para desasociar).
+     */
     public void asociarVenue(Venue venue) {
         setVenue(venue);
     }
-
+    /**
+     * Cancela el evento estableciendo su estado como "Cancelado".
+     * <p>
+     * La lógica de reembolsos, notificaciones u otras acciones relacionadas
+     * se gestionan fuera de este método.
+     *
+     * @param motivo motivo textual de cancelación (obligatorio).
+     * @throws NullPointerException si {@code motivo} es {@code null}.
+     */
     public void cancelar(String motivo) {
         Objects.requireNonNull(motivo, "El motivo es obligatorio");
         setEstado("Cancelado");

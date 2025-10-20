@@ -1,0 +1,13 @@
+[{
+  "precio": 120000,
+  "estado": "emitido",
+  "tipo": "BASICO",
+  "eventoId": "EV001",
+  "numeroAsiento": 15,
+  "cargoServicio": 5000,
+  "localidadNumerada": true,
+  "propietarioLogin": "cli01",
+  "idTiquete": 101,
+  "idLocalidad": "VEN001::VIP",
+  "cargoEmision": 2000
+}]

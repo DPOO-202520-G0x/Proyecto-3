@@ -1,0 +1,20 @@
+[
+  {
+    "cantidadEntradas": 3,
+    "tipo": "MULTIPLE",
+    "precioTotal": 250000
+  },
+  {
+    "cantidadEventos": 5,
+    "tipo": "TEMPORADA",
+    "precioTotal": 700000
+  },
+  {
+    "tipo": "DELUXE",
+    "tiquetesIncluidos": [101],
+    "beneficios": [
+      "Backstage",
+      "Camiseta exclusiva"
+    ]
+  }
+]

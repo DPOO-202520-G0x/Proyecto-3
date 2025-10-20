@@ -1,0 +1,36 @@
+[{
+  "fecha": "2025-12-25",
+  "venue": {
+    "ubicacion": "Bogotá",
+    "idVenue": "VEN001",
+    "capacidadMaxima": 2000,
+    "nombre": "Teatro Los Alpes",
+    "localidades": [
+      {
+        "numeroAsientos": 100,
+        "precioBase": 150000,
+        "numerada": true,
+        "nombre": "VIP"
+      },
+      {
+        "numeroAsientos": 500,
+        "precioBase": 90000,
+        "numerada": false,
+        "nombre": "GENERAL"
+      }
+    ]
+  },
+  "estado": "activo",
+  "tipoEvento": "CONCIERTO",
+  "hora": "20:00:00",
+  "idEvento": "EV001",
+  "administradorLogin": "admin01",
+  "oferta": {
+    "inicio": "2025-10-20T16:04:34.869052600",
+    "fin": "2025-10-29T16:04:34.869052600",
+    "porcentaje": 15
+  },
+  "organizadorLogin": "org01",
+  "tiquetes": [101],
+  "nombre": "Concierto Los Alpes"
+}]

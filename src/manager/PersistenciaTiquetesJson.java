@@ -18,7 +18,12 @@ import tiquetes.PaqueteTiquetes;
 import tiquetes.TiqueteMultiple;
 import tiquetes.TiqueteTemporada;
 import tiquetes.PaqueteDeluxe;
-
+/**
+ * Utilidades de persistencia JSON para tiquetes y paquetes de tiquetes.
+ * <p>
+ * Provee carga/guardado de tiquetes simples y paquetes (múltiple, temporada, deluxe),
+ * reconstruyendo referencias a usuarios, eventos y localidades cuando es posible.
+ */
 public class PersistenciaTiquetesJson {
 
 	private static Map<String, Usuario> indexUsuarios(List<Usuario> usuarios) {
@@ -42,7 +47,16 @@ public class PersistenciaTiquetesJson {
 	    }
 	    return m;
 	}
-	
+	/**
+	 * Carga paquetes de tiquetes desde un JSON, reconstruyendo la información disponible.
+	 *
+	 * @param archivo      ruta del archivo JSON.
+	 * @param usuarios     lista de usuarios existentes (para mapear propietario si corresponde).
+	 * @param eventos      lista de eventos existentes (para contexto).
+	 * @param simplesPorId mapa auxiliar de tiquetes simples por id (para armar paquetes deluxe).
+	 * @return lista de paquetes cargados.
+	 * @throws RuntimeException si ocurre un error de lectura/mapeo JSON.
+	 */
 	public List<PaqueteTiquetes> cargarPaquetes(
 	        String archivo,
 	        List<Usuario> usuarios,
@@ -150,6 +164,13 @@ public class PersistenciaTiquetesJson {
 
 	    return result;
 	}
+	/**
+	 * Serializa y guarda paquetes de tiquetes a un archivo JSON.
+	 *
+	 * @param archivo  ruta del archivo destino.
+	 * @param paquetes paquetes a persistir (múltiple, temporada, deluxe).
+	 * @throws RuntimeException si ocurre un error de escritura/serialización.
+	 */
 public void salvarPaquetes(String archivo, List<PaqueteTiquetes> paquetes) {
     JSONArray arr = new JSONArray();
 
@@ -197,7 +218,17 @@ public void salvarPaquetes(String archivo, List<PaqueteTiquetes> paquetes) {
 
     JsonFiles.write(java.nio.file.Paths.get(archivo), arr.toString(2)); }
 
-
+/**
+ * Carga tiquetes simples (p. ej., {@link tiquetes.TiqueteBasico}) desde un JSON.
+ * <p>
+ * Intenta reconstruir propietario, evento y localidad (si existen en las colecciones provistas).
+ *
+ * @param archivo  ruta del archivo JSON.
+ * @param usuarios lista de usuarios existentes para asociar propietario.
+ * @param eventos  lista de eventos existentes para asociar evento/localidad.
+ * @return lista de tiquetes cargados.
+ * @throws RuntimeException si ocurre un error de lectura/mapeo JSON.
+ */
  public List<Tiquete> cargarTiquetesSimples(String archivo,
                                             List<Usuario> usuarios,
                                             List<Evento> eventos) {
@@ -256,12 +287,22 @@ public void salvarPaquetes(String archivo, List<PaqueteTiquetes> paquetes) {
 
      return result;
  }
-
+ /**
+  * Serializa y guarda tiquetes simples en un archivo JSON.
+  *
+  * @param archivo  ruta del archivo destino.
+  * @param tiquetes tiquetes a persistir.
+  * @throws RuntimeException si ocurre un error de escritura/serialización.
+  */
  public void salvarTiquetesSimples(String archivo, List<Tiquete> tiquetes) {
      JSONArray arr = new JSONArray();
 
      for (Tiquete t : tiquetes) {
+    	 
          JSONObject jt = new JSONObject();
+         String loginDueno = null;
+         if (t.getCliente() instanceof Cliente c) loginDueno = c.getLogin();
+         jt.put("propietarioLogin", loginDueno == null ? JSONObject.NULL : loginDueno);
          jt.put("idTiquete", t.getIdTiquete());
          jt.put("precio", t.getPrecio());
          jt.put("cargoServicio", t.getCargoServicio());

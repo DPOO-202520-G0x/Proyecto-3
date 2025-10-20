@@ -5,7 +5,20 @@ import java.util.Objects;
 import Cliente.Cliente;
 import eventos.Evento;
 import eventos.Localidad;
-
+/**
+ * Clase base abstracta para todos los tiquetes de BoletaMaster.
+ * <p>
+ * Un tiquete pertenece a un {@link eventos.Evento}, está asociado a una
+ * {@link eventos.Localidad} y puede tener un {@link Cliente.Cliente} como propietario.
+ * Conserva su estado y los componentes de precio:
+ * <ul>
+ *   <li>precio base</li>
+ *   <li>cargo porcentual por servicio</li>
+ *   <li>cargo fijo de emisión</li>
+ * </ul>
+ * <p>
+ * Proporciona utilidades comunes como el cálculo del valor total a pagar.
+ */
 public abstract class Tiquete {
     private int idTiquete;
     private double precio;
@@ -15,7 +28,20 @@ public abstract class Tiquete {
     private Localidad localidad;
     private Evento evento;
     private Cliente cliente;
-
+    /**
+     * Construye un tiquete con sus datos de contexto y valores económicos.
+     *
+     * @param cliente        propietario inicial del tiquete (puede ser {@code null} si se asignará luego).
+     * @param idTiquete      identificador único del tiquete.
+     * @param precio         precio base (debe ser coherente con las reglas de negocio).
+     * @param cargoServicio  cargo porcentual/valor por servicio (no negativo).
+     * @param cargoEmision   cargo fijo de emisión (no negativo).
+     * @param estado         estado del tiquete (obligatorio).
+     * @param localidad      localidad asociada (puede ser {@code null} si se define más adelante).
+     * @param evento         evento al que pertenece el tiquete (obligatorio).
+     *
+     * @throws NullPointerException si {@code estado} o {@code evento} son {@code null}.
+     */
     protected Tiquete(Cliente cliente, int idTiquete, double precio, double cargoServicio, double cargoEmision,
             String estado, Localidad localidad, Evento evento) {
         this.cliente = cliente;
@@ -24,7 +50,7 @@ public abstract class Tiquete {
         this.cargoServicio = cargoServicio;
         this.cargoEmision = cargoEmision;
         this.estado = Objects.requireNonNull(estado, "El estado es obligatorio");
-        this.localidad = Objects.requireNonNull(localidad, "La localidad es obligatoria");
+        this.localidad = localidad;
         this.evento = Objects.requireNonNull(evento, "El evento es obligatorio");
     }
 
@@ -100,7 +126,12 @@ public abstract class Tiquete {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-
+    /**
+     * Calcula el valor total del tiquete como suma del precio base,
+     * el cargo por servicio y el cargo de emisión.
+     *
+     * @return total a pagar por el tiquete.
+     */
     public double calcularValorTotal() {
         return precio + cargoServicio + cargoEmision;
     }

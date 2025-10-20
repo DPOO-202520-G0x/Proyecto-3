@@ -5,13 +5,26 @@ import org.json.*;
 
 import eventos.Localidad;
 import eventos.Venue;
-
+/**
+ * Implementación JSON de {@link manager.IPersistenciaVenues}.
+ * <p>
+ * Permite cargar venues y localidades desde archivos separados y guardarlos
+ * nuevamente en JSON (venues y localidades por separado).
+ */
 public class PersistenciaVenuesJson implements IPersistenciaVenues {
 
   private static String locId(Venue v, Localidad l) {
     return v.getIdVenue() + "::" + l.getNombre();
   }
 
+  /**
+   * Carga venues y sus localidades desde dos archivos JSON.
+   *
+   * @param archVenues      archivo con la definición de venues.
+   * @param archLocalidades archivo con la definición de localidades por venue.
+   * @return lista de venues con sus localidades asociadas.
+   * @throws RuntimeException si ocurre un error de lectura/mapeo JSON.
+   */
   @Override
   public List<Venue> cargarVenuesYLocalidades(String archVenues, String archLocalidades) {
     Map<String, Venue> venues = new LinkedHashMap<>();
@@ -46,7 +59,13 @@ public class PersistenciaVenuesJson implements IPersistenciaVenues {
     }
     return new ArrayList<>(venues.values());
   }
-
+  /**
+   * Serializa y guarda venues en un archivo JSON.
+   *
+   * @param archivo ruta del archivo destino.
+   * @param venues  venues a persistir (incluye ids de localidades como referencias).
+   * @throws RuntimeException si ocurre un error de escritura/serialización.
+   */
   @Override
   public void salvarVenues(String archivo, List<Venue> venues) {
     JSONArray arr = new JSONArray();
@@ -57,7 +76,7 @@ public class PersistenciaVenuesJson implements IPersistenciaVenues {
       o.put("ubicacion", v.getUbicacion());
       o.put("capacidadMaxima", v.getCapacidadMaxima());
 
-      // ids de localidades
+      
       JSONArray locIds = new JSONArray();
       for (Localidad l : v.getLocalidades()) locIds.put(locId(v,l));
       o.put("localidadesIds", locIds);
@@ -66,7 +85,13 @@ public class PersistenciaVenuesJson implements IPersistenciaVenues {
     }
     JsonFiles.write(PathResolver.of(archivo), arr.toString(2));
   }
-
+  /**
+   * Serializa y guarda las localidades de los venues en un archivo JSON.
+   *
+   * @param archivo ruta del archivo destino.
+   * @param venues  lista de venues de donde se extraen sus localidades.
+   * @throws RuntimeException si ocurre un error de escritura/serialización.
+   */
   @Override
   public void salvarLocalidades(String archivo, List<Venue> venues) {
     JSONArray arr = new JSONArray();

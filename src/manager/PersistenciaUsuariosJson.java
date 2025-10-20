@@ -16,9 +16,22 @@ import eventos.Evento;
 import eventos.TipoEvento;
 import eventos.Venue;
 import tiquetes.Tiquete;
-
+/**
+ * Implementación JSON de {@link manager.IPersistenciaUsuarios}.
+ * <p>
+ * Gestiona la carga/guardado de administrador, clientes y organizadores,
+ * incluyendo cargos por tipo de evento y relaciones básicas.
+ */
 public class PersistenciaUsuariosJson implements IPersistenciaUsuarios {
-
+	/**
+	 * Carga usuarios desde un archivo JSON y puebla las colecciones provistas.
+	 *
+	 * @param archivo       ruta del archivo JSON.
+	 * @param admin         instancia de administrador a inicializar/actualizar.
+	 * @param clientes      lista destino para clientes cargados (se limpia y repuebla).
+	 * @param organizadores lista destino para organizadores cargados (se limpia y repuebla).
+	 * @throws RuntimeException si ocurre un error de lectura/mapeo JSON.
+	 */
   @Override
   public void cargarUsuarios(String archivo,
                              Administrador admin,
@@ -79,7 +92,15 @@ public class PersistenciaUsuariosJson implements IPersistenciaUsuarios {
         
     }
     }  }
-
+  /**
+   * Serializa y guarda administrador, clientes y organizadores a un archivo JSON.
+   *
+   * @param archivo       ruta del archivo destino.
+   * @param admin         administrador a persistir (incluye cargos y venues aprobados).
+   * @param clientes      clientes a persistir (incluye ids de tiquetes).
+   * @param organizadores organizadores a persistir (incluye ids de eventos y cortesías).
+   * @throws RuntimeException si ocurre un error de escritura/serialización.
+   */
   @Override
   public void salvarUsuarios(String archivo,
                              Administrador admin,

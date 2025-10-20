@@ -9,9 +9,24 @@ import eventos.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
+/**
+ * Implementación JSON de {@link manager.IPersistenciaEventos}.
+ * <p>
+ * Carga y guarda eventos en archivos JSON, reconstruyendo referencias a {@code Venue}
+ * y asociando un organizador por defecto cuando aplique.
+ */
 public class PersistenciaEventosJson implements IPersistenciaEventos {
 
+	/**
+	 * Carga eventos desde un archivo JSON y reconstruye sus referencias.
+	 *
+	 * @param archivo       ruta del archivo JSON con los eventos.
+	 * @param admin         administrador del sistema (contexto requerido por el dominio).
+	 * @param organizadores lista de organizadores existentes para vincular (se usa el primero como default si aplica).
+	 * @param venues        lista de venues existentes para asociar por id.
+	 * @return lista de eventos cargados.
+	 * @throws RuntimeException si ocurre un error de lectura/mapeo JSON.
+	 */
   @Override
   public List<Evento> cargarEventos(String archivo,
                                     Administrador admin,
@@ -51,7 +66,13 @@ public class PersistenciaEventosJson implements IPersistenciaEventos {
     }
     return eventos;
   }
-
+  /**
+   * Persiste la lista de eventos a un archivo JSON.
+   *
+   * @param archivo ruta del archivo destino.
+   * @param eventos eventos a serializar.
+   * @throws RuntimeException si ocurre un error de escritura/serialización.
+   */
   @Override
   public void salvarEventos(String archivo, List<Evento> eventos) {
     JSONArray arr = new JSONArray();

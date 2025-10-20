@@ -1,0 +1,20 @@
+{
+  "administrador": {
+    "idAdministrador": "ADM001",
+    "saldo": 2000000,
+    "login": "ronny",
+    "nombre": "Juan Admin"
+  },
+  "clientes": [{
+    "idCliente": "CLI001",
+    "saldo": 300000,
+    "login": "cli01",
+    "nombre": "Pedro Cliente"
+  }],
+  "organizadores": [{
+    "saldo": 1000000,
+    "login": "org01",
+    "nombre": "Laura Organizadora",
+    "idOrganizador": "ORG001"
+  }]
+}
