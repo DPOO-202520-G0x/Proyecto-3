@@ -1,35 +1,73 @@
 {
   "administrador": {
     "idAdministrador": "ADM001",
-    "password": "ronny",
-    "cargosServicio": {
-      "CONCIERTO": 0,
-      "CULTURAL": 0,
-      "DEPORTIVO": 0,
-      "RELIGIOSO": 0
-    },
-    "ganancias": 0,
-    "venuesAprobados": [],
     "saldo": 2000000,
     "login": "ronny",
-    "nombre": "Juan Admin",
-    "cargoEmision": 0
-  },
-  "clientes": [{
-    "password": "cli01",
-    "idCliente": "CLI001",
-    "saldo": 300000,
-    "login": "cli01",
-    "tiquetes": [101],
-    "nombre": "Pedro Cliente"
-  }],
-  "organizadores": [{
-    "password": "org01",
-    "finanzas": 0,
-    "eventos": ["EV001"],
-    "saldo": 1000000,
-    "login": "org01",
-    "nombre": "Laura Organizadora",
-    "idOrganizador": "ORG001"
-  }]
-}
+	"password": "ronny",
+	"nombre": "Juan Admin",
+    "ganancias": 0
+	  },
+	  "clientes": [
+	      {
+	        "idCliente": "CLI001",
+	        "saldo": 300000,
+	        "login": "cli01",
+	        "password": "cli01",
+	        "nombre": "Pedro Cliente"
+	      },
+	      {
+	        "idCliente": "CLI002",
+	        "saldo": 450000,
+	        "login": "cli02",
+	        "password": "cli02",
+	        "nombre": "María Melómana"
+	      },
+	      {
+	        "idCliente": "CLI003",
+	        "saldo": 180000,
+	        "login": "cli03",
+	        "password": "cli03",
+	        "nombre": "Julián Festivalero"
+	      },
+	      {
+	        "idCliente": "CLI004",
+	        "saldo": 520000,
+	        "login": "cli04",
+	        "password": "cli04",
+	        "nombre": "Laura Impro"
+	      },
+	      {
+	        "idCliente": "CLI005",
+	        "saldo": 275000,
+	        "login": "cli05",
+	        "password": "cli05",
+	        "nombre": "Sofía Deportista"
+	      }
+	    ],
+	    "organizadores": [
+	      {
+	        "idOrganizador": "ORG001",
+	        "saldo": 1000000,
+	        "login": "org01",
+	        "password": "org01",
+	        "nombre": "Laura Organizadora",
+	        "finanzas": 250000
+	      },
+	      {
+	        "idOrganizador": "ORG002",
+	        "saldo": 850000,
+	        "login": "org02",
+	        "password": "org02",
+	        "nombre": "Ricardo Festivales",
+	        "finanzas": 180000
+	      },
+	      {
+	        "idOrganizador": "ORG003",
+	        "saldo": 640000,
+	        "login": "org03",
+	        "password": "org03",
+	        "nombre": "Camila Teatro",
+	        "finanzas": 95000
+	      }
+	    ]
+	  }

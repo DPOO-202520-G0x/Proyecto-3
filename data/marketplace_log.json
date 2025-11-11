@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "fechaHora": "2024-05-20T10:15:00",
+    "tipo": "OFERTA_CREADA",
+    "descripcion": "cli01 publicó la oferta OFER-100 con el tiquete 101"
+  },
+  {
+    "fechaHora": "2024-05-21T09:10:00",
+    "tipo": "CONTRAOFERTA_RECIBIDA",
+    "descripcion": "cli04 ofreció 205000 por la oferta OFER-100"
+  },
+  {
+    "fechaHora": "2024-05-19T15:40:00",
+    "tipo": "CONTRAOFERTA_ACEPTADA",
+    "descripcion": "cli02 aceptó la contraoferta CO-211 de cli01 en la oferta OFER-101"
+  },
+  {
+    "fechaHora": "2024-05-10T10:00:00",
+    "tipo": "OFERTA_CANCELADA",
+    "descripcion": "cli04 canceló la oferta OFER-102"
+  }
+]
