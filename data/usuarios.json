@@ -1,17 +1,32 @@
 {
   "administrador": {
     "idAdministrador": "ADM001",
+    "password": "ronny",
+    "cargosServicio": {
+      "CONCIERTO": 0,
+      "CULTURAL": 0,
+      "DEPORTIVO": 0,
+      "RELIGIOSO": 0
+    },
+    "ganancias": 0,
+    "venuesAprobados": [],
     "saldo": 2000000,
     "login": "ronny",
-    "nombre": "Juan Admin"
+    "nombre": "Juan Admin",
+    "cargoEmision": 0
   },
   "clientes": [{
+    "password": "cli01",
     "idCliente": "CLI001",
     "saldo": 300000,
     "login": "cli01",
+    "tiquetes": [101],
     "nombre": "Pedro Cliente"
   }],
   "organizadores": [{
+    "password": "org01",
+    "finanzas": 0,
+    "eventos": ["EV001"],
     "saldo": 1000000,
     "login": "org01",
     "nombre": "Laura Organizadora",

@@ -1,6 +1,7 @@
 package manager;
 
 import Cliente.Administrador;
+
 import Cliente.Cliente;
 import Cliente.Organizador;
 import eventos.Evento;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -158,6 +160,10 @@ final class JsonDataStore {
         JSONArray eventos = new JSONArray(raw);
         Map<String, Organizador> organizadores = state.getOrganizadoresPorLogin();
         Map<String, Evento> eventosPorId = state.getEventosPorId();
+        Administrador admin = state.getAdministrador();
+        if (admin == null) {
+            throw new IllegalStateException("No hay administrador cargado para los eventos");
+        }
         for (int i = 0; i < eventos.length(); i++) {
             JSONObject e = eventos.getJSONObject(i);
             JSONObject venueJson = e.getJSONObject("venue");
@@ -177,32 +183,41 @@ final class JsonDataStore {
                     venueJson.getString("nombre"),
                     venueJson.optString("ubicacion", ""),
                     venueJson.optInt("capacidadMaxima", 0),
-                    localidades,
-                    state.getAdministrador());
+                    localidades);
+
             String tipo = e.optString("tipoEvento", TipoEvento.CONCIERTO.name());
             Evento evento = new Evento(
+                    admin,
                     e.getString("idEvento"),
                     e.getString("nombre"),
                     LocalDate.parse(e.getString("fecha")),
                     LocalTime.parse(e.optString("hora", "00:00")),
+                    e.optString("estado", "CREADO"),
                     TipoEvento.valueOf(tipo),
                     venue,
-                    new ArrayList<>(),
-                    e.optString("estado", "CREADO"));
+                    null,
+                    null,
+                    new ArrayList<>());
+            venue.registrarEvento(evento);
             String organizadorLogin = e.optString("organizadorLogin", null);
             if (organizadorLogin != null) {
                 Organizador organizador = organizadores.get(organizadorLogin);
                 if (organizador != null) {
                     evento.setOrganizador(organizador);
-                    organizador.agregarEvento(evento);
+                    organizador.registrarEvento(evento);
                 }
             }
             if (e.has("oferta")) {
                 JSONObject ofertaJson = e.getJSONObject("oferta");
-                evento.setOferta(new Oferta(
-                        ofertaJson.getDouble("porcentaje"),
-                        LocalDate.parse(ofertaJson.getString("inicio")),
-                        LocalDate.parse(ofertaJson.getString("fin"))));
+                Localidad localidadOferta = buscarLocalidad(venue, ofertaJson.optString("idLocalidad", null));
+                LocalDateTime inicio = parseDateTime(ofertaJson.optString("inicio", null));
+                LocalDateTime fin = parseDateTime(ofertaJson.optString("fin", null));
+                if (localidadOferta != null && inicio != null && fin != null) {
+                    Oferta oferta = new Oferta(localidadOferta, evento,
+                            ofertaJson.getDouble("porcentaje"), inicio, fin);
+                    localidadOferta.setOferta(oferta);
+                    evento.setOferta(oferta);
+                }
             }
             eventosPorId.put(evento.getIdEvento(), evento);
         }
@@ -223,37 +238,56 @@ final class JsonDataStore {
         for (int i = 0; i < arr.length(); i++) {
             JSONObject t = arr.getJSONObject(i);
             Evento evento = eventos.get(t.optString("eventoId", null));
-            Tiquete tiquete;
-            if ("BASICO".equalsIgnoreCase(t.optString("tipo", "BASICO"))) {
-                TiqueteBasico basico = new TiqueteBasico(
-                        t.getInt("idTiquete"),
-                        evento,
-                        t.optDouble("precio", 0.0),
-                        t.optDouble("cargoServicio", 0.0),
-                        t.optDouble("cargoEmision", 0.0),
-                        t.optString("numeroAsiento", null),
-                        t.optBoolean("localidadNumerada", false));
-                basico.setLocalidad(buscarLocalidad(evento == null ? null : evento.getVenue(), t.optString("idLocalidad", null)));
-                tiquete = basico;
-            } else {
-                tiquete = new Tiquete(
-                        t.getInt("idTiquete"),
-                        evento,
-                        t.optDouble("precio", 0.0),
-                        t.optDouble("cargoServicio", 0.0),
-                        t.optDouble("cargoEmision", 0.0),
-                        t.optString("estado", "CREADO"));
+            if (evento == null) {
+                continue;
             }
+            String tipoTiquete = t.optString("tipo", "BASICO");
+            Localidad localidad = buscarLocalidad(evento == null ? null : evento.getVenue(), t.optString("idLocalidad", null));
+            Cliente propietario = null;
             String propietarioLogin = t.optString("propietarioLogin", null);
             if (propietarioLogin != null) {
-                Cliente propietario = clientes.get(propietarioLogin);
-                if (propietario != null) {
-                    propietario.agregarTiquete(tiquete);
-                    tiquete.setCliente(propietario);
-                }
+                propietario = clientes.get(propietarioLogin);
+            }
+            Tiquete tiquete;
+            if ("BASICO".equalsIgnoreCase(tipoTiquete)) {
+                Integer numeroAsiento = t.has("numeroAsiento") && !t.isNull("numeroAsiento")
+                        ? t.getInt("numeroAsiento") : null;
+                TiqueteBasico basico = new TiqueteBasico(
+                		propietario,
+                        t.getInt("idTiquete"),
+                        t.optDouble("precio", 0.0),
+                        t.optDouble("cargoServicio", 0.0),
+                        t.optDouble("cargoEmision", 0.0),
+                        t.optString("estado", "CREADO"),
+                        localidad,
+                        evento,
+                        numeroAsiento,
+                        t.optBoolean("localidadNumerada", false));
+                
+                tiquete = basico;
+            } else {
+            	TiqueteBasico generico = new TiqueteBasico(
+                        propietario,
+                        t.getInt("idTiquete"),
+                        t.optDouble("precio", 0.0),
+                        t.optDouble("cargoServicio", 0.0),
+                        t.optDouble("cargoEmision", 0.0),
+                        t.optString("estado", "CREADO"),
+                        localidad,
+                        evento,
+                        null,
+                        t.optBoolean("localidadNumerada", false));
+                tiquete = generico;
+            }
+            if (propietario != null) {
+                propietario.agregarTiquete(tiquete);
+                tiquete.setCliente(propietario);
+            }
+            if (localidad != null) {
+                localidad.agregarTiquete(tiquete);
             }
             if (evento != null) {
-                evento.agregarTiquete(tiquete);
+                evento.registrarTiquete(tiquete);
             }
             tiquetes.put(tiquete.getIdTiquete(), tiquete);
         }
@@ -469,6 +503,12 @@ final class JsonDataStore {
                 o.put("porcentaje", oferta.getPorcentaje());
                 o.put("inicio", oferta.getInicio().toString());
                 o.put("fin", oferta.getFin().toString());
+                if (oferta.getLocalidad() != null && evento.getVenue() != null) {
+                    String idLocalidad = evento.getVenue().getIdVenue() + "::" + oferta.getLocalidad().getNombre();
+                    o.put("idLocalidad", idLocalidad);
+                } else {
+                    o.put("idLocalidad", JSONObject.NULL);
+                }
                 e.put("oferta", o);
             }
             arr.put(e);
@@ -561,5 +601,19 @@ final class JsonDataStore {
             }
         }
         return null;
+    }
+    private LocalDateTime parseDateTime(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(value);
+        } catch (DateTimeParseException ex) {
+            try {
+                return LocalDate.parse(value).atStartOfDay();
+            } catch (DateTimeParseException ignored) {
+                return null;
+            }
+        }
     }
 }

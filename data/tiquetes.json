@@ -6,8 +6,8 @@
   "numeroAsiento": 15,
   "cargoServicio": 5000,
   "localidadNumerada": true,
-  "propietarioLogin": "cli01",
   "idTiquete": 101,
+  "propietarioLogin": "cli01",
   "idLocalidad": "VEN001::VIP",
   "cargoEmision": 2000
 }]
