@@ -6,7 +6,7 @@ import log.LogSistema;
 import marketPlace.ContraOferta;
 import marketPlace.EstadoOferta;
 import marketPlace.OfertaMarketPlace;
-import marketPlace.estadoContraOferta;
+import marketPlace.EstadoContraOferta;
 import tiquetes.Tiquete;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ final class MarketplaceService {
         Map<OfertaMarketPlace, List<ContraOferta>> result = new LinkedHashMap<>();
         for (OfertaMarketPlace oferta : obtenerOfertasPorVendedor(vendedor)) {
             List<ContraOferta> pendientes = oferta.getContraofertas().stream()
-                    .filter(c -> c.getEstado() == estadoContraOferta.PENDIENTE)
+                    .filter(c -> c.getEstado() == EstadoContraOferta.PENDIENTE)
                     .collect(Collectors.toList());
             if (!pendientes.isEmpty()) {
                 result.put(oferta, pendientes);
@@ -164,10 +164,10 @@ final class MarketplaceService {
         OfertaMarketPlace oferta = validarOfertaDeVendedor(vendedor, ofertaId);
         ContraOferta contra = oferta.buscarContraoferta(contraofertaId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe la contraoferta"));
-        if (contra.getEstado() != estadoContraOferta.PENDIENTE) {
+        if (contra.getEstado() != EstadoContraOferta.PENDIENTE) {
             throw new IllegalStateException("La contraoferta ya fue gestionada");
         }
-        contra.setEstado(estadoContraOferta.RECHAZADA);
+        contra.setEstado(EstadoContraOferta.RECHAZADA);
         logSistema.registrar("CONTRAOFERTA", String.format("%s rechazó la contraoferta %s de %s",
                 vendedor.getLogin(), contra.getId(), contra.getComprador().getLogin()));
     }
@@ -179,7 +179,7 @@ final class MarketplaceService {
         }
         ContraOferta contra = oferta.buscarContraoferta(contraofertaId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe la contraoferta"));
-        if (contra.getEstado() != estadoContraOferta.PENDIENTE) {
+        if (contra.getEstado() != EstadoContraOferta.PENDIENTE) {
             throw new IllegalStateException("La contraoferta ya fue gestionada");
         }
         Cliente comprador = contra.getComprador();
@@ -187,7 +187,7 @@ final class MarketplaceService {
         comprador.usarSaldo(monto);
         vendedor.acreditarSaldo(monto);
         transferirTiquetes(oferta, comprador);
-        contra.setEstado(estadoContraOferta.ACEPTADA);
+        contra.setEstado(EstadoContraOferta.ACEPTADA);
         oferta.setEstado(EstadoOferta.VENDIDA);
         logSistema.registrar("CONTRAOFERTA", String.format("%s aceptó la contraoferta %s de %s",
                 vendedor.getLogin(), contra.getId(), comprador.getLogin()));

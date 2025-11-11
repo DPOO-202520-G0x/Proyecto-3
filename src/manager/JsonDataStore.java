@@ -12,7 +12,7 @@ import log.EntradaLog;
 import marketPlace.ContraOferta;
 import marketPlace.EstadoOferta;
 import marketPlace.OfertaMarketPlace;
-import marketPlace.estadoContraOferta;
+import marketPlace.EstadoContraOferta;
 import tiquetes.Tiquete;
 import tiquetes.TiqueteBasico;
 
@@ -346,7 +346,7 @@ final class JsonDataStore {
                             c.getString("id"),
                             comprador,
                             c.getDouble("monto"),
-                            estadoContraOferta.valueOf(c.getString("estado")),
+                            EstadoContraOferta.valueOf(c.getString("estado")),
                             LocalDateTime.parse(c.getString("fechaCreacion"))));
                 }
             }
