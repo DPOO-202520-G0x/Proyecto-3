@@ -19,8 +19,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -259,7 +261,19 @@ public class marketPlaceTest {
     void consultarLog_conCredencialesValidasDevuelveEntradas() {
         Administrador admin = sistema.getAdministrador();
 
-        sistema.publicarOferta(vendedorPrincipal, List.of(104), 120000.0);
+        Set<Integer> tiquetesEnOferta = new HashSet<>();
+        sistema.obtenerOfertasPorVendedor(vendedorPrincipal)
+                .forEach(oferta -> oferta.getTiquetes()
+                        .forEach(t -> tiquetesEnOferta.add(t.getIdTiquete())));
+
+        int tiqueteDisponible = vendedorPrincipal.verTiquetes().stream()
+                .mapToInt(t -> t.getIdTiquete())
+                .filter(id -> !tiquetesEnOferta.contains(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "El vendedor principal no tiene tiquetes disponibles para la prueba"));
+
+        sistema.publicarOferta(vendedorPrincipal, List.of(tiqueteDisponible), 120000.0);
 
         List<EntradaLog> entradas = sistema.getLogSistema().consultar(admin, admin.getLogin(), admin.getPassword());
 
