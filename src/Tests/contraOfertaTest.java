@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class contraOfertaTest {
 
     @Test
-    void constructorPorDefectoDejaEstadoPendiente() {
+    void constructorEstadoPendiente() {
         Cliente comprador = new Cliente("buyer", "pass", "Comprador", 150_000.0, "CLI910");
 
         ContraOferta contra = new ContraOferta(comprador, 120_000.0);
@@ -26,7 +26,7 @@ class contraOfertaTest {
     }
 
     @Test
-    void cambiarEstadoActualizaPropiedadYValidaNull() {
+    void actualizarEstado() {
         Cliente comprador = new Cliente("buyer", "pass", "Comprador", 150_000.0, "CLI911");
         ContraOferta contra = new ContraOferta(comprador, 95_000.0);
 
