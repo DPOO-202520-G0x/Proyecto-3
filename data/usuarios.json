@@ -19,20 +19,19 @@
     {
       "password": "cli05",
       "idCliente": "CLI005",
-      "saldo": 274947,
+      "saldo": 275010,
       "login": "cli05",
       "tiquetes": [
         401,
         402,
-        202,
-        203
+        202
       ],
       "nombre": "Sofía Deportista"
     },
     {
       "password": "cli04",
       "idCliente": "CLI004",
-      "saldo": 520000,
+      "saldo": 519940,
       "login": "cli04",
       "tiquetes": [
         204,
@@ -43,11 +42,12 @@
     {
       "password": "cli01",
       "idCliente": "CLI001",
-      "saldo": 290054,
+      "saldo": 290051,
       "login": "cli01",
       "tiquetes": [
         403,
-        101
+        101,
+        203
       ],
       "nombre": "Pedro Cliente"
     },
