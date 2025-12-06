@@ -74,9 +74,22 @@ Así podrás comprobar el flujo de impresión y las restricciones de transferenc
    - En las propiedades del proyecto (`Right click > Properties > Java Build Path > Source`) asegúrate de que `src/` esté como *Source folder*.
    - En `Java Build Path > Libraries` agrega el *jar* de JUnit (descargado en `lib/junit-platform-console-standalone-1.10.2.jar`) con **Add External JARs…**. Si no quieres descargar nada todavía, omite este paso y solo podrás ejecutar las apps de consola.
    - En `Java Build Path > Libraries` agrega también `bin/` como *Class folder* si Eclipse no lo detecta automáticamente.
+   - Si Eclipse te muestra un *error* por un jar inexistente (p. ej. un `json-20240303.jar` que apunta a tu PC local) elimínalo de la pestaña **Libraries** y luego ejecuta `Project > Clean`. Sin ese jar fantasma, la clase `gui.BoletaMasterUI` se compila y Eclipse la reconoce como entrada principal.
 3. **Genera los `.class` en Eclipse**: clic derecho sobre el proyecto → **Build Project**. Eclipse compilará a `bin/` (o al output folder que definas).
 4. **Ejecuta las apps de consola**: clic derecho sobre `console.ClienteApp` (o `console.OrganizadorApp`/`console.AdminApp`) → `Run As > Java Application`. Si Eclipse pregunta por la configuración principal, selecciona la clase correspondiente.
 5. **Ejecuta los tests** (opcional): con el *jar* de JUnit en el *Build Path*, clic derecho sobre `src/Tests` → `Run As > JUnit Test`. Verás en la vista de JUnit que los casos `ImpresionYTransferenciaTest` pasan o fallan.
 6. **Depuración rápida**: usa `Run > Debug As > Java Application` sobre las mismas clases; coloca *breakpoints* en métodos de `Tiquete` o `Cliente` para ver cómo se bloquean impresiones o transferencias tras el primer `imprimir()`.
 
 Con esos pasos podrás revisar desde Eclipse los mismos flujos de impresión, transferencia y marketplace descritos más arriba.
+
+### ¿Cómo abrir y probar la GUI (Swing) en Eclipse?
+1. **Ubica la clase principal**: en `src/gui/BoletaMasterUI.java` hay un `main` listo para ejecutar.
+2. **Confirma el *working directory***: en `Run > Run Configurations... > Java Application > (BoletaMasterUI)` establece el *Working directory* al directorio raíz del proyecto (`TALLER_3`). Esto asegura que la ruta relativa `data/` se resuelva y el estado se cargue/guarde.
+3. **Ejecuta**: clic derecho sobre `BoletaMasterUI` → **Run As > Java Application**. Se abrirá la ventana Swing con la pantalla de login.
+4. **Credenciales de ejemplo**:
+   - Administrador: usuario `ronny`, contraseña `ronny`.
+   - Organizadores: `org01`/`org01`, `org02`/`org02`, `org03`/`org03`.
+   - Clientes: `cli01`/`cli01` ... `cli05`/`cli05`.
+5. **Flujo de cierre**: al cerrar la ventana, el sistema invoca `guardarDatos()`; si hiciste pruebas que cambian el estado, los JSON en `data/` se actualizarán.
+
+Con esa configuración podrás validar desde Eclipse toda la interfaz gráfica Swing, sin pasos adicionales.
