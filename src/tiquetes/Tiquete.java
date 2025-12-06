@@ -1,14 +1,13 @@
 package tiquetes;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.Objects;
 
 import Cliente.Cliente;
 import eventos.Evento;
 import eventos.Localidad;
+import tiquetes.DatosImpresion;
 /**
  * Clase base abstracta para todos los tiquetes de BoletaMaster.
  * <p>
@@ -157,6 +156,14 @@ public abstract class Tiquete {
      * @throws IllegalStateException si el tiquete ya había sido impreso.
      */
     public synchronized String imprimir() {
+        return imprimirConDatos().comoTexto();
+    }
+
+    /**
+     * Variante estructurada que devuelve un objeto con toda la información de
+     * impresión, incluyendo el payload plano para generar el QR.
+     */
+    public synchronized DatosImpresion imprimirConDatos() {
         if (impreso) {
             throw new IllegalStateException("El tiquete ya fue impreso");
         }
@@ -175,30 +182,30 @@ public abstract class Tiquete {
         return precio + cargoServicio + cargoEmision;
     }
 
-    private String construirTiqueteParaImpresion() {
+    private DatosImpresion construirTiqueteParaImpresion() {
         String fechaEvento = String.format("%s %s", evento.getFecha(), evento.getHora());
         String fechaImpresionLegible = fechaImpresion.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        String qrData = generarContenidoQR(fechaEvento, fechaImpresionLegible);
-        return new StringBuilder()
-                .append("=== BOLETA MASTER ===\n")
-                .append("Evento: ").append(evento.getNombre()).append(" (").append(evento.getIdEvento()).append(")\n")
-                .append("Localidad: ").append(localidad != null ? localidad.getNombre() : "N/D").append("\n")
-                .append("ID Tiquete: ").append(idTiquete).append("\n")
-                .append("Fecha evento: ").append(fechaEvento).append("\n")
-                .append("Fecha impresión: ").append(fechaImpresionLegible).append("\n")
-                .append("Precio total: $").append(String.format("%.2f", calcularValorTotal())).append("\n")
-                .append("QR-DATA: ").append(qrData).append("\n")
-                .toString();
+        String localidadNombre = localidad != null ? localidad.getNombre() : "N/D";
+        String qrData = generarContenidoQR(fechaEvento, fechaImpresionLegible, localidadNombre);
+        return new DatosImpresion(
+                idTiquete,
+                evento.getNombre(),
+                evento.getIdEvento(),
+                fechaEvento,
+                fechaImpresionLegible,
+                localidadNombre,
+                calcularValorTotal(),
+                qrData
+        );
     }
 
-    private String generarContenidoQR(String fechaEvento, String fechaImpresionLegible) {
-        String contenidoPlano = String.format(
-                "evento=%s;id=%d;fechaEvento=%s;impreso=%s",
-                evento.getIdEvento(),
-                idTiquete,
-                fechaEvento,
-                fechaImpresionLegible
-        );
-        return Base64.getEncoder().encodeToString(contenidoPlano.getBytes(StandardCharsets.UTF_8));
+    private String generarContenidoQR(String fechaEvento, String fechaImpresionLegible, String localidadNombre) {
+        return new StringBuilder()
+                .append("Evento:").append(evento.getNombre()).append(" (").append(evento.getIdEvento()).append(")\n")
+                .append("ID:").append(idTiquete).append('\n')
+                .append("Localidad:").append(localidadNombre).append('\n')
+                .append("F.Evento:").append(fechaEvento).append('\n')
+                .append("F.Impresión:").append(fechaImpresionLegible)
+                .toString();
     }
 }

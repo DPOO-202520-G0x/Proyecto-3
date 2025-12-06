@@ -8,11 +8,14 @@ import manager.BoletaMasterSystem;
 import marketPlace.ContraOferta;
 import marketPlace.EstadoContraOferta;
 import marketPlace.OfertaMarketPlace;
+import tiquetes.DatosImpresion;
 import tiquetes.Tiquete;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,12 +28,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +136,181 @@ public class BoletaMasterUI extends JPanel {
     }
 }
 
+class TicketPreviewDialog {
+    public static void mostrar(JPanel parent, DatosImpresion datos) {
+        javax.swing.JDialog dialog = new javax.swing.JDialog(SwingUtilities.getWindowAncestor(parent), "Imprimir BoletaMaster", Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(900, 520);
+        dialog.setLocationRelativeTo(parent);
+
+        JPanel cuerpo = new JPanel(new BorderLayout());
+        cuerpo.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        PosterPanel poster = new PosterPanel();
+        poster.setPreferredSize(new Dimension(450, 480));
+        cuerpo.add(poster, BorderLayout.WEST);
+
+        JPanel detalle = new JPanel(new GridBagLayout());
+        detalle.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new java.awt.Color(255, 215, 0)),
+                new EmptyBorder(12, 12, 12, 12)));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(4, 4, 4, 4);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        detalle.add(new JLabel("Evento:"), gbc);
+        gbc.gridx = 1;
+        detalle.add(new JLabel(datos.nombreEvento + " - ID " + datos.idEvento), gbc);
+
+        gbc.gridx = 0; gbc.gridy++;
+        detalle.add(new JLabel("ID Tiquete:"), gbc);
+        gbc.gridx = 1;
+        detalle.add(new JLabel(String.valueOf(datos.idTiquete)), gbc);
+
+        gbc.gridx = 0; gbc.gridy++;
+        detalle.add(new JLabel("Localidad:"), gbc);
+        gbc.gridx = 1;
+        detalle.add(new JLabel(datos.localidad), gbc);
+
+        gbc.gridx = 0; gbc.gridy++;
+        detalle.add(new JLabel("Fecha del evento:"), gbc);
+        gbc.gridx = 1;
+        detalle.add(new JLabel(datos.fechaEvento), gbc);
+
+        gbc.gridx = 0; gbc.gridy++;
+        detalle.add(new JLabel("Fecha de impresión:"), gbc);
+        gbc.gridx = 1;
+        detalle.add(new JLabel(datos.fechaImpresion), gbc);
+
+        gbc.gridx = 0; gbc.gridy++;
+        detalle.add(new JLabel("Precio total:"), gbc);
+        gbc.gridx = 1;
+        detalle.add(new JLabel(String.format("$%.2f", datos.precioTotal)), gbc);
+
+        BufferedImage qrImg = QRUtils.generarQR(datos.payloadQR, 8, 2);
+        JLabel qrLabel = new JLabel(new ImageIcon(qrImg));
+        qrLabel.setBorder(BorderFactory.createTitledBorder("QR listo para escanear"));
+
+        JPanel derecha = new JPanel(new BorderLayout());
+        derecha.add(detalle, BorderLayout.CENTER);
+        derecha.add(qrLabel, BorderLayout.EAST);
+
+        cuerpo.add(derecha, BorderLayout.CENTER);
+        dialog.add(cuerpo, BorderLayout.CENTER);
+
+        JTextArea textoPlano = new JTextArea(datos.comoTexto());
+        textoPlano.setEditable(false);
+        dialog.add(new JScrollPane(textoPlano), BorderLayout.SOUTH);
+
+        JButton cerrar = new JButton("Cerrar vista previa");
+        cerrar.addActionListener(e -> dialog.dispose());
+        dialog.add(cerrar, BorderLayout.NORTH);
+
+        dialog.setVisible(true);
+    }
+}
+
+class BannerPanel extends JPanel {
+    BannerPanel() {
+        setPreferredSize(new Dimension(520, 400));
+    }
+
+    @Override
+    protected void paintComponent(java.awt.Graphics g) {
+        super.paintComponent(g);
+        var g2 = (java.awt.Graphics2D) g.create();
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+        java.awt.GradientPaint grad = new java.awt.GradientPaint(0, 0, new java.awt.Color(30, 61, 127),
+                getWidth(), getHeight(), new java.awt.Color(116, 199, 255));
+        g2.setPaint(grad);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 32, 32);
+
+        g2.setColor(new java.awt.Color(255, 255, 255, 180));
+        g2.fillRoundRect(40, 40, getWidth() - 80, getHeight() - 80, 24, 24);
+
+        g2.setColor(new java.awt.Color(16, 38, 91));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 32f));
+        g2.drawString("BoletaMaster", 70, 120);
+
+        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 18f));
+        g2.drawString("Empresa dedicada a la venta de tiquetes", 70, 155);
+        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 15f));
+        g2.drawString("Eventos en vivo, deportes y cultura con acceso inmediato.", 70, 185);
+
+        g2.setColor(new java.awt.Color(247, 198, 62));
+        g2.fillRoundRect(70, 230, getWidth() - 140, 110, 20, 20);
+        g2.setColor(new java.awt.Color(51, 25, 7));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 20f));
+        g2.drawString("Artista destacado: Estrella Invitada", 90, 270);
+        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 14f));
+        g2.drawString("¡Compra y administra tus tiquetes desde una misma ventana!", 90, 300);
+
+        g2.setColor(new java.awt.Color(255, 255, 255, 160));
+        for (int i = 0; i < 8; i++) {
+            int x = 80 + i * 50;
+            int y = 60 + (i % 2 == 0 ? 0 : 18);
+            g2.fillOval(x, y, 12, 12);
+        }
+
+        g2.dispose();
+    }
+}
+
+class PosterPanel extends JPanel {
+    PosterPanel() {
+        setPreferredSize(new Dimension(450, 480));
+    }
+
+    @Override
+    protected void paintComponent(java.awt.Graphics g) {
+        super.paintComponent(g);
+        var g2 = (java.awt.Graphics2D) g.create();
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+        java.awt.GradientPaint fondo = new java.awt.GradientPaint(0, 0, new java.awt.Color(13, 12, 50),
+                getWidth(), getHeight(), new java.awt.Color(88, 31, 94));
+        g2.setPaint(fondo);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 28, 28);
+
+        g2.setColor(new java.awt.Color(255, 193, 7, 200));
+        g2.fillRoundRect(30, 40, getWidth() - 60, getHeight() - 80, 22, 22);
+
+        g2.setColor(new java.awt.Color(33, 25, 10));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 26f));
+        g2.drawString("Vista previa BoletaMaster", 50, 90);
+
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 20f));
+        g2.drawString("Artista invitado: Legend Live", 50, 130);
+
+        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 15f));
+        g2.drawString("Escucha los éxitos y accede al show con tu QR único.", 50, 160);
+
+        g2.setColor(new java.awt.Color(0, 0, 0, 30));
+        for (int i = 0; i < 6; i++) {
+            int baseY = 190 + i * 40;
+            g2.fillRoundRect(50, baseY, getWidth() - 120, 26, 16, 16);
+        }
+
+        g2.setColor(new java.awt.Color(255, 255, 255, 120));
+        for (int i = 0; i < 9; i++) {
+            int x = 70 + (i * 40) % (getWidth() - 140);
+            int y = 220 + (i * 35) % (getHeight() - 200);
+            int size = 30 + (i % 3) * 8;
+            g2.fillOval(x, y, size, size);
+        }
+
+        g2.setColor(new java.awt.Color(33, 25, 10));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        g2.drawString("Escanea el QR para validar tu entrada", 50, getHeight() - 60);
+
+        g2.dispose();
+    }
+}
+
 enum RolSeleccionado { CLIENTE, ADMIN, ORGANIZADOR }
 
 interface LoginHandler {
@@ -142,44 +322,53 @@ class LoginPanel extends JPanel {
     private LoginHandler handler;
 
     public LoginPanel() {
-        super(new GridBagLayout());
+        super(new BorderLayout());
         construir();
     }
 
     private void construir() {
+        JPanel formulario = new JPanel(new GridBagLayout());
+        formulario.setBorder(new EmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        javax.swing.JLabel titulo = new javax.swing.JLabel("BoletaMaster · Empresa dedicada a la venta de tiquetes");
+        titulo.setFont(titulo.getFont().deriveFont(16f));
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(new javax.swing.JLabel("Rol:"), gbc);
+        gbc.gridwidth = 2;
+        formulario.add(titulo, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        formulario.add(new javax.swing.JLabel("Rol:"), gbc);
 
         JComboBox<RolSeleccionado> roles = new JComboBox<>(RolSeleccionado.values());
         gbc.gridx = 1;
-        add(roles, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(new javax.swing.JLabel("Login:"), gbc);
-
-        JTextField loginField = new JTextField(20);
-        gbc.gridx = 1;
-        add(loginField, gbc);
+        formulario.add(roles, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        add(new javax.swing.JLabel("Contraseña:"), gbc);
+        formulario.add(new javax.swing.JLabel("Usuario:"), gbc);
+
+        JTextField loginField = new JTextField(20);
+        gbc.gridx = 1;
+        formulario.add(loginField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formulario.add(new javax.swing.JLabel("Contraseña:"), gbc);
 
         JPasswordField passwordField = new JPasswordField(20);
         gbc.gridx = 1;
-        add(passwordField, gbc);
+        formulario.add(passwordField, gbc);
 
-        JButton ingresar = new JButton("Ingresar");
+        JButton ingresar = new JButton("Ingresar a BoletaMaster");
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
-        add(ingresar, gbc);
+        formulario.add(ingresar, gbc);
 
         ingresar.addActionListener(e -> {
             if (handler != null) {
@@ -188,6 +377,12 @@ class LoginPanel extends JPanel {
                         new String(passwordField.getPassword()));
             }
         });
+
+        BannerPanel banner = new BannerPanel();
+        banner.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        add(banner, BorderLayout.WEST);
+        add(formulario, BorderLayout.CENTER);
     }
 
     public void setOnLogin(LoginHandler handler) {
@@ -394,8 +589,8 @@ class ClientePanel extends JPanel {
             return;
         }
         try {
-            String salida = tiquete.imprimir();
-            mostrarTextoLargo("Tiquete generado", salida);
+            DatosImpresion datos = tiquete.imprimirConDatos();
+            TicketPreviewDialog.mostrar(this, datos);
             sistema.guardarDatos();
             refrescarTiquetes();
         } catch (Exception e) {
