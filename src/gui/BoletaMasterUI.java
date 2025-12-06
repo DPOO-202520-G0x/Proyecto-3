@@ -138,10 +138,12 @@ public class BoletaMasterUI extends JPanel {
 
 class TicketPreviewDialog {
     public static void mostrar(JPanel parent, DatosImpresion datos) {
-        javax.swing.JDialog dialog = new javax.swing.JDialog(SwingUtilities.getWindowAncestor(parent), "Imprimir BoletaMaster", Dialog.ModalityType.APPLICATION_MODAL);
+        javax.swing.JDialog dialog = new javax.swing.JDialog(
+                SwingUtilities.getWindowAncestor(parent),
+                "Imprimir BoletaMaster",
+                Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setLayout(new BorderLayout());
-        dialog.setSize(900, 520);
-        dialog.setLocationRelativeTo(parent);
+        dialog.setMinimumSize(new Dimension(1000, 620));
 
         JPanel cuerpo = new JPanel(new BorderLayout());
         cuerpo.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -190,9 +192,10 @@ class TicketPreviewDialog {
         gbc.gridx = 1;
         detalle.add(new JLabel(String.format("$%.2f", datos.precioTotal)), gbc);
 
-        BufferedImage qrImg = QRUtils.generarQR(datos.payloadQR, 8, 2);
+        BufferedImage qrImg = QRUtils.generarQR(datos.payloadQR, 6, 2);
         JLabel qrLabel = new JLabel(new ImageIcon(qrImg));
         qrLabel.setBorder(BorderFactory.createTitledBorder("QR listo para escanear"));
+        qrLabel.setPreferredSize(new Dimension(qrImg.getWidth() + 40, qrImg.getHeight() + 40));
 
         JPanel derecha = new JPanel(new BorderLayout());
         derecha.add(detalle, BorderLayout.CENTER);
@@ -209,6 +212,8 @@ class TicketPreviewDialog {
         cerrar.addActionListener(e -> dialog.dispose());
         dialog.add(cerrar, BorderLayout.NORTH);
 
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
     }
 }
