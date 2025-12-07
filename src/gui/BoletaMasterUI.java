@@ -45,6 +45,7 @@ import java.awt.image.RescaleOp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -123,7 +124,7 @@ public class BoletaMasterUI extends JPanel {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Path dataDir = Path.of("data");
+            Path dataDir = Paths.get("data");
             BoletaMasterSystem sistema = BoletaMasterSystem.desdeDirectorio(dataDir.toString());
             sistema.cargarDatos();
 
@@ -238,8 +239,6 @@ class BannerPanel extends JPanel {
     BannerPanel() {
         setPreferredSize(new Dimension(560, 500));
         setOpaque(false);
-    BannerPanel() {
-        setPreferredSize(new Dimension(520, 400));
     }
 
     @Override
