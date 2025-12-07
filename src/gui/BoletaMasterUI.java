@@ -447,7 +447,7 @@ class AvatarPreviewPanel extends JPanel {
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(300, 940));
+        setPreferredSize(new Dimension(320, 620));
 
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
@@ -471,8 +471,8 @@ class AvatarPreviewPanel extends JPanel {
         descripcion.setLineWrap(true);
         descripcion.setWrapStyleWord(true);
         descripcion.setBorder(new EmptyBorder(4, 10, 4, 10));
-        descripcion.setRows(8);
-        descripcion.setMaximumSize(new Dimension(280, 260));
+        descripcion.setRows(6);
+        descripcion.setMaximumSize(new Dimension(280, 220));
 
         descripcionExtra = new JTextArea();
         descripcionExtra.setEditable(false);
@@ -482,8 +482,8 @@ class AvatarPreviewPanel extends JPanel {
         descripcionExtra.setLineWrap(true);
         descripcionExtra.setWrapStyleWord(true);
         descripcionExtra.setBorder(new EmptyBorder(0, 10, 6, 10));
-        descripcionExtra.setRows(5);
-        descripcionExtra.setMaximumSize(new Dimension(280, 190));
+        descripcionExtra.setRows(4);
+        descripcionExtra.setMaximumSize(new Dimension(280, 170));
 
         badgesPanel = new JPanel();
         badgesPanel.setLayout(new javax.swing.BoxLayout(badgesPanel, javax.swing.BoxLayout.Y_AXIS));
@@ -498,11 +498,11 @@ class AvatarPreviewPanel extends JPanel {
         premios.setBorder(new EmptyBorder(10, 12, 10, 12));
         premios.setLineWrap(true);
         premios.setWrapStyleWord(true);
-        premios.setRows(22);
+        premios.setRows(10);
         premios.setAlignmentX(CENTER_ALIGNMENT);
-        premios.setMaximumSize(new Dimension(280, 520));
-        premios.setPreferredSize(new Dimension(280, 440));
-        premios.setMinimumSize(new Dimension(260, 320));
+        premios.setMaximumSize(new Dimension(280, 260));
+        premios.setPreferredSize(new Dimension(280, 230));
+        premios.setMinimumSize(new Dimension(260, 200));
 
         JPanel tarjeta = new JPanel() {
             @Override
@@ -541,7 +541,7 @@ class AvatarPreviewPanel extends JPanel {
         infoProyecto.setBorder(new EmptyBorder(8, 10, 10, 10));
         infoProyecto.setLineWrap(true);
         infoProyecto.setWrapStyleWord(true);
-        infoProyecto.setRows(9);
+        infoProyecto.setRows(5);
         infoProyecto.setFocusable(false);
         infoProyecto.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -560,7 +560,7 @@ class AvatarPreviewPanel extends JPanel {
         };
         franja.setOpaque(false);
         franja.setBorder(new EmptyBorder(10, 8, 12, 8));
-        franja.setPreferredSize(new Dimension(260, 128));
+        franja.setPreferredSize(new Dimension(280, 118));
         franja.add(infoProyecto, BorderLayout.CENTER);
 
         add(franja, BorderLayout.SOUTH);
