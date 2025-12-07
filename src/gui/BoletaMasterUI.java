@@ -254,14 +254,14 @@ class BannerPanel extends JPanel {
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        header.setBorder(new EmptyBorder(16, 18, 10, 18));
+        header.setBorder(new EmptyBorder(8, 14, 6, 14));
 
         JLabel titulo = new JLabel("<html><div style='text-align:left;'>"
-                + "<div style='font-size:28px;font-weight:800;'>BOLETAMASTER</div>"
-                + "<div style='font-size:16px;font-weight:500;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
+                + "<div style='font-size:24px;font-weight:800;line-height:1.05;'>BOLETAMASTER</div>"
+                + "<div style='font-size:14px;font-weight:600;line-height:1.05;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
                 + "</div></html>", JLabel.LEFT);
         titulo.setForeground(Color.WHITE);
-        titulo.setBorder(BorderFactory.createEmptyBorder(6, 10, 10, 10));
+        titulo.setBorder(BorderFactory.createEmptyBorder(4, 10, 6, 10));
         titulo.setVerticalAlignment(JLabel.TOP);
 
         JPanel headerBadge = new JPanel(new BorderLayout()) {
@@ -277,8 +277,8 @@ class BannerPanel extends JPanel {
             }
         };
         headerBadge.setOpaque(false);
-        headerBadge.setBorder(new EmptyBorder(12, 14, 12, 14));
-        headerBadge.setPreferredSize(new Dimension(680, 92));
+        headerBadge.setBorder(new EmptyBorder(10, 12, 10, 12));
+        headerBadge.setPreferredSize(new Dimension(520, 84));
         headerBadge.add(titulo, BorderLayout.CENTER);
 
         header.add(headerBadge, BorderLayout.CENTER);
