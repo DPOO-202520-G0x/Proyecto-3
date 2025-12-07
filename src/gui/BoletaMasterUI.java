@@ -157,7 +157,7 @@ class TicketPreviewDialog {
         JPanel cuerpo = new JPanel(new BorderLayout());
         cuerpo.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        PosterPanel poster = new PosterPanel();
+        PosterPanel poster = new PosterPanel(datos);
         poster.setPreferredSize(new Dimension(450, 480));
         cuerpo.add(poster, BorderLayout.WEST);
 
@@ -350,7 +350,10 @@ class BannerPanel extends JPanel {
 
 class PosterPanel extends JPanel {
 
-    PosterPanel() {
+    private final DatosImpresion datos;
+
+    PosterPanel(DatosImpresion datos) {
+        this.datos = datos;
         setPreferredSize(new Dimension(450, 480));
     }
 
@@ -374,26 +377,68 @@ class PosterPanel extends JPanel {
         g2.fillRoundRect(42, 280, getWidth() - 84, 140, 18, 18);
 
         g2.setColor(Color.WHITE);
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 26f));
-        g2.drawString("BoletaMaster en vivo", 54, 82);
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 24f));
+        g2.drawString("BoletaMaster presenta", 54, 82);
 
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 19f));
-        g2.drawString("Shakira · Karol G · Juanes", 54, 112);
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 20f));
+        drawWrapped(g2, datos.nombreEvento, 54, 112, getWidth() - 108, 22);
 
         g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 14f));
-        g2.drawString("Prepara tu QR único y disfruta el show sin filas.", 54, 138);
+        drawWrapped(g2, "Tu acceso para " + datos.fechaEvento + " · Localidad " + datos.localidad,
+                54, 148, getWidth() - 108, 18);
 
-        g2.setColor(new Color(255, 255, 255, 160));
-        for (int i = 0; i < 7; i++) {
-            int baseY = 210 + i * 32;
-            g2.fillRoundRect(64, baseY, getWidth() - 128, 22, 14, 14);
-        }
+        drawChipList(g2, 64, 210, getWidth() - 128, new String[]{
+                "ID evento " + datos.idEvento,
+                "Tiquete #" + datos.idTiquete,
+                "Localidad: " + datos.localidad,
+                "Fecha: " + datos.fechaEvento,
+                "Precio: $" + String.format("%.0f", datos.precioTotal),
+                "Emisión: " + datos.fechaImpresion
+        });
 
         g2.setColor(Color.WHITE);
         g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 16f));
         g2.drawString("Escanea el QR para validar tu entrada", 64, getHeight() - 56);
 
         g2.dispose();
+    }
+
+    private void drawWrapped(java.awt.Graphics2D g2, String texto, int x, int y, int width, int lineHeight) {
+        FontMetrics fm = g2.getFontMetrics();
+        String[] palabras = texto.split(" ");
+        StringBuilder linea = new StringBuilder();
+        int cursorY = y;
+        for (String palabra : palabras) {
+            String candidata = linea.length() == 0 ? palabra : linea + " " + palabra;
+            if (fm.stringWidth(candidata) > width) {
+                g2.drawString(linea.toString(), x, cursorY);
+                linea = new StringBuilder(palabra);
+                cursorY += lineHeight;
+            } else {
+                linea = new StringBuilder(candidata);
+            }
+        }
+        if (!linea.isEmpty()) {
+            g2.drawString(linea.toString(), x, cursorY);
+        }
+    }
+
+    private void drawChipList(java.awt.Graphics2D g2, int startX, int startY, int maxWidth, String[] chips) {
+        int x = startX;
+        int y = startY;
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 14f));
+        for (String chip : chips) {
+            int chipW = g2.getFontMetrics().stringWidth(chip) + 24;
+            if (x + chipW > startX + maxWidth) {
+                x = startX;
+                y += 34;
+            }
+            g2.setColor(new Color(255, 255, 255, 160));
+            g2.fillRoundRect(x, y, chipW, 26, 12, 12);
+            g2.setColor(new Color(35, 54, 96));
+            g2.drawString(chip, x + 12, y + 18);
+            x += chipW + 10;
+        }
     }
 }
 
