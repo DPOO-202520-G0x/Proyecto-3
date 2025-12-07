@@ -33,12 +33,10 @@ import java.awt.CardLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.JComponent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -52,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -236,6 +235,7 @@ class BannerPanel extends JPanel {
     private final AvatarPreviewPanel preview;
     private final RotatingLogo logo;
     private final CarouselBand carousel;
+    private final Map<String, ImageIcon> avatares;
 
     BannerPanel(List<String> eventosDisponibles) {
         this.eventos = eventosDisponibles == null || eventosDisponibles.isEmpty()
@@ -249,83 +249,26 @@ class BannerPanel extends JPanel {
         preview = new AvatarPreviewPanel();
         logo = new RotatingLogo();
         carousel = new CarouselBand(eventos, artistas);
+        avatares = crearAvatares();
 
         JPanel contenido = new JPanel(new BorderLayout());
         contenido.setOpaque(false);
         contenido.setBorder(new EmptyBorder(28, 32, 28, 32));
 
-        contenido.add(crearCabecera(), BorderLayout.NORTH);
-        contenido.add(crearChipsInteractivos(), BorderLayout.CENTER);
-        contenido.add(carousel, BorderLayout.SOUTH);
+        JPanel pistaCarrusel = new JPanel(new BorderLayout());
+        pistaCarrusel.setOpaque(false);
+        pistaCarrusel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 90), 1, true),
+                new EmptyBorder(18, 18, 18, 18)));
+        carousel.setPreferredSize(new Dimension(560, 220));
+        carousel.setHoverListener(this::actualizarPreviewDesdeCarousel);
+        pistaCarrusel.add(carousel, BorderLayout.CENTER);
+
+        contenido.add(pistaCarrusel, BorderLayout.CENTER);
 
         add(contenido, BorderLayout.CENTER);
         add(preview, BorderLayout.EAST);
         add(logo, BorderLayout.SOUTH);
-    }
-
-    private JComponent crearCabecera() {
-        JPanel cabecera = new JPanel(new BorderLayout());
-        cabecera.setOpaque(false);
-        JLabel titulo = new JLabel("BoletaMaster · Vive tus eventos sin filas");
-        titulo.setForeground(new Color(238, 244, 255));
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 24f));
-        JLabel subtitulo = new JLabel("Venta de tiquetes para conciertos, deportes y teatro en una interfaz más viva");
-        subtitulo.setForeground(new Color(220, 230, 245));
-        subtitulo.setFont(subtitulo.getFont().deriveFont(java.awt.Font.PLAIN, 14f));
-
-        cabecera.add(titulo, BorderLayout.NORTH);
-        cabecera.add(subtitulo, BorderLayout.CENTER);
-        return cabecera;
-    }
-
-    private JPanel crearChipsInteractivos() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel seccionEventos = new JLabel("Eventos en rotación");
-        seccionEventos.setForeground(Color.WHITE);
-        seccionEventos.setFont(seccionEventos.getFont().deriveFont(java.awt.Font.BOLD, 16f));
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        panel.add(seccionEventos, gbc);
-
-        gbc.gridy++; gbc.gridwidth = 1;
-        panel.add(crearNube(eventos, new Color(245, 199, 83)), gbc);
-
-        gbc.gridx = 1;
-        panel.add(crearNube(artistas, new Color(111, 203, 255)), gbc);
-
-        return panel;
-    }
-
-    private JPanel crearNube(List<String> textos, Color base) {
-        JPanel nube = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        nube.setOpaque(false);
-        for (String texto : textos) {
-            JLabel chip = new JLabel(texto, crearAvatar(texto, base.darker()), JLabel.LEFT);
-            chip.setOpaque(true);
-            chip.setBackground(new Color(base.getRed(), base.getGreen(), base.getBlue(), 180));
-            chip.setForeground(new Color(18, 26, 48));
-            chip.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
-            chip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-            chip.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    preview.actualizar(texto, (ImageIcon) chip.getIcon());
-                    carousel.destacar(texto);
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    preview.restaurarMensaje();
-                    carousel.destacar(null);
-                }
-            });
-            nube.add(chip);
-        }
-        return nube;
     }
 
     private ImageIcon crearAvatar(String nombre, Color base) {
@@ -347,6 +290,23 @@ class BannerPanel extends JPanel {
         g2.drawRoundRect(2, 2, size - 4, size - 4, 18, 18);
         g2.dispose();
         return new ImageIcon(img);
+    }
+
+    private Map<String, ImageIcon> crearAvatares() {
+        java.util.Map<String, ImageIcon> mapa = new java.util.HashMap<>();
+        Color baseEventos = new Color(245, 199, 83);
+        Color baseArtistas = new Color(111, 203, 255);
+        eventos.forEach(ev -> mapa.put(ev, crearAvatar(ev, baseEventos.darker())));
+        artistas.forEach(ar -> mapa.put(ar, crearAvatar(ar, baseArtistas.darker())));
+        return mapa;
+    }
+
+    private void actualizarPreviewDesdeCarousel(String item) {
+        if (item == null) {
+            preview.restaurarMensaje();
+        } else {
+            preview.actualizar(item, avatares.get(item));
+        }
     }
 
     @Override
@@ -456,20 +416,42 @@ class CarouselBand extends JPanel {
     private final javax.swing.Timer timer;
     private int offset = 0;
     private String destacado;
+    private Consumer<String> hoverListener;
+    private final java.util.List<ItemBox> cajas = new java.util.ArrayList<>();
 
     CarouselBand(List<String> eventos, List<String> artistas) {
         setOpaque(false);
-        setPreferredSize(new Dimension(400, 72));
+        setPreferredSize(new Dimension(520, 160));
         this.items = concat(eventos, artistas);
         timer = new javax.swing.Timer(2200, e -> {
             offset = (offset + 1) % items.size();
             repaint();
         });
         timer.start();
+
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                detectarHover(e.getPoint());
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                destacar(null);
+            }
+        });
+    }
+
+    void setHoverListener(Consumer<String> listener) {
+        this.hoverListener = listener;
     }
 
     void destacar(String texto) {
         this.destacado = texto;
+        if (hoverListener != null) {
+            hoverListener.accept(texto);
+        }
         repaint();
     }
 
@@ -479,28 +461,47 @@ class CarouselBand extends JPanel {
         var g2 = (java.awt.Graphics2D) g.create();
         g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(new Color(0, 0, 0, 50));
-        g2.fillRoundRect(0, 10, getWidth(), getHeight() - 20, 16, 16);
-        int x = 12;
-        int y = getHeight() / 2 + 6;
+        g2.fillRoundRect(0, 10, getWidth(), getHeight() - 20, 20, 20);
+        int x = 18;
+        int y = getHeight() / 2 + 8;
+        cajas.clear();
         for (int i = 0; i < items.size(); i++) {
             String texto = items.get((i + offset) % items.size());
             boolean esDestacado = texto.equals(destacado);
             Color base = esDestacado ? new Color(255, 193, 7) : new Color(255, 255, 255, 210);
             g2.setColor(base);
-            int w = g2.getFontMetrics().stringWidth(texto) + 26;
-            if (x + w > getWidth() - 12) {
+            int w = Math.min(getWidth() - 36, g2.getFontMetrics().stringWidth(texto) + 32);
+            if (x + w > getWidth() - 18) {
                 break;
             }
-            g2.fillRoundRect(x, y - 18, w, 32, 16, 16);
+            int h = 40;
+            g2.fillRoundRect(x, y - 22, w, h, 18, 18);
             g2.setColor(esDestacado ? new Color(35, 54, 96) : new Color(12, 18, 48));
-            g2.drawString(texto, x + 12, y);
-            x += w + 10;
+            g2.drawString(texto, x + 16, y + 2);
+            cajas.add(new ItemBox(texto, x, y - 22, w, h));
+            x += w + 14;
         }
         g2.dispose();
     }
 
+    private void detectarHover(java.awt.Point p) {
+        for (ItemBox box : cajas) {
+            if (box.contains(p)) {
+                destacar(box.texto());
+                return;
+            }
+        }
+        destacar(null);
+    }
+
     private static List<String> concat(List<String> a, List<String> b) {
         return java.util.stream.Stream.concat(a.stream(), b.stream()).toList();
+    }
+}
+
+record ItemBox(String texto, int x, int y, int w, int h) {
+    boolean contains(java.awt.Point p) {
+        return p.x >= x && p.x <= x + w && p.y >= y && p.y <= y + h;
     }
 }
 
