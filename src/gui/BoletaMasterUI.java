@@ -368,7 +368,21 @@ class BannerPanel extends JPanel {
     }
 
     private String envolverInfo(String texto) {
-        return "<html><div style='text-align:center;width:230px;'>" + texto + "</div></html>";
+        if (texto == null) {
+            return "";
+        }
+        String[] partes = texto.split("·");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < partes.length; i++) {
+            if (i > 0) {
+                sb.append(" · ");
+            }
+            sb.append(partes[i].trim());
+            if (i < partes.length - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
     }
 
     private double calcularRecaudo(Evento evento) {
@@ -448,8 +462,8 @@ class AvatarPreviewPanel extends JPanel {
         descripcion.setLineWrap(true);
         descripcion.setWrapStyleWord(true);
         descripcion.setBorder(new EmptyBorder(4, 10, 4, 10));
-        descripcion.setRows(5);
-        descripcion.setMaximumSize(new Dimension(240, 180));
+        descripcion.setRows(6);
+        descripcion.setMaximumSize(new Dimension(260, 210));
 
         descripcionExtra = new JTextArea();
         descripcionExtra.setEditable(false);
@@ -459,8 +473,8 @@ class AvatarPreviewPanel extends JPanel {
         descripcionExtra.setLineWrap(true);
         descripcionExtra.setWrapStyleWord(true);
         descripcionExtra.setBorder(new EmptyBorder(0, 10, 6, 10));
-        descripcionExtra.setRows(3);
-        descripcionExtra.setMaximumSize(new Dimension(240, 120));
+        descripcionExtra.setRows(4);
+        descripcionExtra.setMaximumSize(new Dimension(260, 150));
 
         badgesPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 6));
         badgesPanel.setOpaque(false);
@@ -507,7 +521,7 @@ class AvatarPreviewPanel extends JPanel {
         infoProyecto.setBorder(new EmptyBorder(8, 10, 10, 10));
         infoProyecto.setLineWrap(true);
         infoProyecto.setWrapStyleWord(true);
-        infoProyecto.setRows(3);
+        infoProyecto.setRows(4);
         infoProyecto.setFocusable(false);
         infoProyecto.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -526,7 +540,7 @@ class AvatarPreviewPanel extends JPanel {
         };
         franja.setOpaque(false);
         franja.setBorder(new EmptyBorder(8, 6, 8, 6));
-        franja.setPreferredSize(new Dimension(260, 64));
+        franja.setPreferredSize(new Dimension(260, 92));
         franja.add(infoProyecto, BorderLayout.CENTER);
 
         add(franja, BorderLayout.SOUTH);
@@ -545,7 +559,7 @@ class AvatarPreviewPanel extends JPanel {
         actualizarBadges(logros);
         premios.setText(generarPremios(nombre));
         avatar.setIcon(icon);
-        infoProyecto.setText(infoExterior);
+        infoProyecto.setText(limpiarHtml(infoExterior));
     }
 
     void restaurarMensaje() {
@@ -649,6 +663,17 @@ class AvatarPreviewPanel extends JPanel {
     }
 
     private record SegmentoTexto(String arriba, String abajo) {
+    }
+
+    private String limpiarHtml(String texto) {
+        if (texto == null) {
+            return "";
+        }
+        String normalizado = texto
+                .replace("<br>", "\n")
+                .replace("<br/>", "\n")
+                .replace("<br />", "\n");
+        return normalizado.replaceAll("<[^>]+>", "").trim();
     }
 }
 
