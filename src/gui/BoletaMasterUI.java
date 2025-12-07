@@ -349,18 +349,18 @@ class BannerPanel extends JPanel {
             if (evento != null) {
                 String capacidad = evento.getCapacidadMaxima() > 0
                         ? Integer.toString(evento.getCapacidadMaxima())
-                        : "cap. pendiente";
+                        : "capacidad por anunciar";
+                String infoProyecto = String.format("Proyecto: %s · Vendidos %d/%s · %s %s",
+                        evento.getNombre(), evento.getVendidos(), capacidad,
+                        evento.getFecha(), evento.getHora());
 
-                preview.actualizar(item, avatares.get(item),
-                        String.format("Vendidos: %d / %s (%.0f%%)", evento.getVendidos(),
-                                capacidad, evento.getPorcentajeVenta()),
-                        String.format("Recaudo estimado: $%,.0f", calcularRecaudo(evento)),
-                        String.format("Fecha: %s · %s", evento.getFecha(), evento.getHora()));
+                preview.actualizarNarrativa(item, avatares.get(item),
+                        preview.generarLogrosCortos(item),
+                        infoProyecto);
             } else {
-                preview.actualizar(item, avatares.get(item),
-                        "Artista destacado en BoletaMaster",
-                        "Explora próximos conciertos y festivales",
-                        "Pasa el cursor para descubrir más");
+                preview.actualizarNarrativa(item, avatares.get(item),
+                        preview.generarLogrosCortos(item),
+                        "Proyecto: cartel global en rotación");
             }
         }
     }
@@ -415,11 +415,13 @@ class AvatarPreviewPanel extends JPanel {
     private final JLabel detalle2;
     private final JLabel detalle3;
     private final JLabel premios;
+    private final JLabel avatar;
+    private final JLabel infoProyecto;
 
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(220, 440));
+        setPreferredSize(new Dimension(240, 460));
 
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
@@ -429,6 +431,10 @@ class AvatarPreviewPanel extends JPanel {
         destacado = new JLabel("", JLabel.CENTER);
         destacado.setForeground(new Color(255, 236, 179));
         destacado.setFont(destacado.getFont().deriveFont(java.awt.Font.BOLD, 13f));
+
+        avatar = new JLabel();
+        avatar.setHorizontalAlignment(JLabel.CENTER);
+        avatar.setBorder(new EmptyBorder(4, 0, 6, 0));
 
         JPanel tarjeta = new JPanel(new GridBagLayout()) {
             @Override
@@ -457,9 +463,11 @@ class AvatarPreviewPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.insets = new Insets(6, 8, 6, 8);
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        tarjeta.add(avatar, gbc);
+        gbc.gridy++;
         tarjeta.add(destacado, gbc);
         gbc.gridy++;
         tarjeta.add(detalle1, gbc);
@@ -473,16 +481,24 @@ class AvatarPreviewPanel extends JPanel {
         add(titulo, BorderLayout.NORTH);
         add(tarjeta, BorderLayout.CENTER);
 
+        infoProyecto = new JLabel("", JLabel.CENTER);
+        infoProyecto.setForeground(new Color(220, 230, 245));
+        infoProyecto.setFont(infoProyecto.getFont().deriveFont(java.awt.Font.BOLD, 11.5f));
+        infoProyecto.setBorder(new EmptyBorder(8, 4, 10, 4));
+        add(infoProyecto, BorderLayout.SOUTH);
+
         restaurarMensaje();
     }
 
-    void actualizar(String nombre, ImageIcon icon, String linea1, String linea2, String linea3) {
+    void actualizarNarrativa(String nombre, ImageIcon icon, List<String> logros, String infoExterior) {
         titulo.setText(nombre);
         destacado.setText(generarDescripcion(nombre));
-        detalle1.setText(linea1);
-        detalle2.setText(linea2);
-        detalle3.setText(linea3);
+        detalle1.setText(logros.size() > 0 ? logros.get(0) : "");
+        detalle2.setText(logros.size() > 1 ? logros.get(1) : "");
+        detalle3.setText(logros.size() > 2 ? logros.get(2) : "");
         premios.setText(generarPremios(nombre));
+        avatar.setIcon(icon);
+        infoProyecto.setText(infoExterior);
     }
 
     void restaurarMensaje() {
@@ -492,6 +508,8 @@ class AvatarPreviewPanel extends JPanel {
         detalle2.setText("Pasa el cursor por los mosaicos para ver estadísticas");
         detalle3.setText("Compra, imprime tu QR y disfruta del show");
         premios.setText("Premios y reconocimientos aparecerán aquí");
+        avatar.setIcon(null);
+        infoProyecto.setText("Info del proyecto aparecerá aquí");
     }
 
     private JLabel crearDetalleLabel() {
@@ -512,12 +530,25 @@ class AvatarPreviewPanel extends JPanel {
 
     private String generarDescripcion(String nombre) {
         String[] descripciones = {
-                "Headliner global con shows épicos", "Revelación del año en vivo",
-                "Tour mundial en rotación", "Nominado a múltiples premios", "Colaboraciones con grandes estrellas",
-                "Sonido que mezcla géneros", "Pionero en experiencias inmersivas", "Setlist cargado de éxitos"
+                "Headliner global", "Revelación en vivo",
+                "Tour mundial", "Multi-premiado", "Colaboraciones top",
+                "Fusión de géneros", "Experiencia inmersiva", "Setlist de hits"
         };
         int idx = Math.abs(nombre.toLowerCase().hashCode()) % descripciones.length;
         return descripciones[idx];
+    }
+
+    List<String> generarLogrosCortos(String nombre) {
+        String[] logros = {
+                "Grammy Latino", "Billboard", "Sesión MTV", "Gira SoldOut", "Top Spotify",
+                "Headliner", "Premio Shock", "Tour Andes", "Show viral", "Colab global"
+        };
+        Random r = new Random(Math.abs(nombre.hashCode()));
+        return java.util.stream.IntStream.range(0, 3)
+                .mapToObj(i -> logros[(r.nextInt(logros.length))])
+                .distinct()
+                .limit(3)
+                .collect(Collectors.toList());
     }
 }
 
