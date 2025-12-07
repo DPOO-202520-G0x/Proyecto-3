@@ -71,7 +71,7 @@ public class BoletaMasterUI extends JPanel {
     }
 
     private void construirUI() {
-        LoginPanel loginPanel = new LoginPanel(sistema.getNombresEventosOrdenados());
+        LoginPanel loginPanel = new LoginPanel(new java.util.ArrayList<>(sistema.getTodosLosEventos()));
         JPanel placeholder = new JPanel();
 
         cardPanel.add(loginPanel, "login");
@@ -230,16 +230,16 @@ class TicketPreviewDialog {
 
 class BannerPanel extends JPanel {
 
-    private final List<String> eventos;
+    private final List<Evento> eventos;
     private final List<String> artistas;
     private final AvatarPreviewPanel preview;
     private final RotatingLogo logo;
     private final TileCarousel carousel;
     private final Map<String, ImageIcon> avatares;
 
-    BannerPanel(List<String> eventosDisponibles) {
-        this.eventos = eventosDisponibles == null || eventosDisponibles.isEmpty()
-                ? List.of("Concierto Andes", "Festival Pacífico", "Teatro Central", "Derby Andino")
+    BannerPanel(List<Evento> eventosDisponibles) {
+        this.eventos = (eventosDisponibles == null || eventosDisponibles.isEmpty())
+                ? List.of()
                 : eventosDisponibles;
         this.artistas = List.of("Shakira", "Karol G", "Juanes", "Fonseca", "Morat", "Carlos Vives");
         setOpaque(false);
@@ -248,21 +248,17 @@ class BannerPanel extends JPanel {
 
         preview = new AvatarPreviewPanel();
         logo = new RotatingLogo();
-        carousel = new TileCarousel(eventos, artistas);
+        carousel = new TileCarousel(extraerNombresEventos(), artistas);
         avatares = crearAvatares();
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(new EmptyBorder(16, 18, 10, 18));
 
-        JLabel titulo = new JLabel("BOLETAMASTER", JLabel.LEFT);
+        JLabel titulo = new JLabel("BOLETAMASTER · Tu boletería oficial para conciertos, festivales y teatros", JLabel.LEFT);
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 28f));
-        titulo.setBorder(BorderFactory.createEmptyBorder(2, 0, 6, 0));
-
-        JLabel subtitulo = new JLabel("¡Bienvenid@! Compra, imprime y vive tus eventos", JLabel.LEFT);
-        subtitulo.setForeground(new Color(235, 242, 255));
-        subtitulo.setFont(subtitulo.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 26f));
+        titulo.setBorder(BorderFactory.createEmptyBorder(6, 10, 10, 10));
 
         JPanel headerBadge = new JPanel(new BorderLayout()) {
             @Override
@@ -277,17 +273,10 @@ class BannerPanel extends JPanel {
             }
         };
         headerBadge.setOpaque(false);
-        headerBadge.setBorder(new EmptyBorder(10, 16, 12, 16));
-        headerBadge.add(titulo, BorderLayout.NORTH);
-        headerBadge.add(subtitulo, BorderLayout.SOUTH);
-
-        JLabel slogan = new JLabel("Tu boletería oficial para conciertos, festivales y teatro", JLabel.LEFT);
-        slogan.setForeground(new Color(223, 234, 255));
-        slogan.setFont(slogan.getFont().deriveFont(java.awt.Font.PLAIN, 14f));
-        slogan.setBorder(new EmptyBorder(6, 0, 0, 0));
+        headerBadge.setBorder(new EmptyBorder(12, 14, 12, 14));
+        headerBadge.add(titulo, BorderLayout.CENTER);
 
         header.add(headerBadge, BorderLayout.CENTER);
-        header.add(slogan, BorderLayout.SOUTH);
 
         JPanel contenido = new JPanel(new BorderLayout());
         contenido.setOpaque(false);
@@ -308,6 +297,17 @@ class BannerPanel extends JPanel {
         add(contenido, BorderLayout.CENTER);
         add(preview, BorderLayout.EAST);
         add(logo, BorderLayout.SOUTH);
+    }
+
+    private List<String> extraerNombresEventos() {
+        if (eventos.isEmpty()) {
+            return List.of("Concierto Andes", "Festival Pacífico", "Teatro Central", "Derby Andino");
+        }
+        return eventos.stream()
+                .map(Evento::getNombre)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private ImageIcon crearAvatar(String nombre, Color base) {
@@ -333,9 +333,10 @@ class BannerPanel extends JPanel {
 
     private Map<String, ImageIcon> crearAvatares() {
         java.util.Map<String, ImageIcon> mapa = new java.util.HashMap<>();
+        List<String> nombresEventos = extraerNombresEventos();
         Color baseEventos = new Color(245, 199, 83);
         Color baseArtistas = new Color(111, 203, 255);
-        eventos.forEach(ev -> mapa.put(ev, crearAvatar(ev, baseEventos.darker())));
+        nombresEventos.forEach(ev -> mapa.put(ev, crearAvatar(ev, baseEventos.darker())));
         artistas.forEach(ar -> mapa.put(ar, crearAvatar(ar, baseArtistas.darker())));
         return mapa;
     }
@@ -344,8 +345,43 @@ class BannerPanel extends JPanel {
         if (item == null) {
             preview.restaurarMensaje();
         } else {
-            preview.actualizar(item, avatares.get(item));
+            Evento evento = buscarEvento(item);
+            if (evento != null) {
+                String capacidad = evento.getCapacidadMaxima() > 0
+                        ? Integer.toString(evento.getCapacidadMaxima())
+                        : "cap. pendiente";
+
+                preview.actualizar(item, avatares.get(item),
+                        String.format("Vendidos: %d / %s (%.0f%%)", evento.getVendidos(),
+                                capacidad, evento.getPorcentajeVenta()),
+                        String.format("Recaudo estimado: $%,.0f", calcularRecaudo(evento)),
+                        String.format("Fecha: %s · %s", evento.getFecha(), evento.getHora()));
+            } else {
+                preview.actualizar(item, avatares.get(item),
+                        "Artista destacado en BoletaMaster",
+                        "Explora próximos conciertos y festivales",
+                        "Pasa el cursor para descubrir más");
+            }
         }
+    }
+
+    private Evento buscarEvento(String nombre) {
+        if (nombre == null) {
+            return null;
+        }
+        return eventos.stream()
+                .filter(e -> nombre.equalsIgnoreCase(e.getNombre()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private double calcularRecaudo(Evento evento) {
+        if (evento == null) {
+            return 0;
+        }
+        return evento.getTiquetes().stream()
+                .mapToDouble(t -> t.getPrecio() + t.getCargoServicio() + t.getCargoEmision())
+                .sum();
     }
 
     @Override
@@ -375,6 +411,9 @@ class BannerPanel extends JPanel {
 class AvatarPreviewPanel extends JPanel {
     private final JLabel titulo;
     private final JLabel imagen;
+    private final JLabel detalle1;
+    private final JLabel detalle2;
+    private final JLabel detalle3;
 
     AvatarPreviewPanel() {
         super(new BorderLayout());
@@ -382,25 +421,61 @@ class AvatarPreviewPanel extends JPanel {
         setPreferredSize(new Dimension(180, 420));
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.PLAIN, 12f));
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 13f));
+
         imagen = new JLabel();
         imagen.setHorizontalAlignment(JLabel.CENTER);
         imagen.setVerticalAlignment(JLabel.CENTER);
         imagen.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(255, 255, 255, 60)),
                 new EmptyBorder(14, 10, 14, 10)));
+
+        detalle1 = crearDetalleLabel();
+        detalle2 = crearDetalleLabel();
+        detalle3 = crearDetalleLabel();
+
+        JPanel detallePanel = new JPanel();
+        detallePanel.setOpaque(false);
+        detallePanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(4, 4, 4, 4);
+        gbc.anchor = GridBagConstraints.CENTER;
+        detallePanel.add(detalle1, gbc);
+        gbc.gridy++;
+        detallePanel.add(detalle2, gbc);
+        gbc.gridy++;
+        detallePanel.add(detalle3, gbc);
+
         add(titulo, BorderLayout.NORTH);
         add(imagen, BorderLayout.CENTER);
+        add(detallePanel, BorderLayout.SOUTH);
+
+        restaurarMensaje();
     }
 
-    void actualizar(String nombre, ImageIcon icon) {
+    void actualizar(String nombre, ImageIcon icon, String linea1, String linea2, String linea3) {
         titulo.setText(nombre);
         imagen.setIcon(icon);
+        detalle1.setText(linea1);
+        detalle2.setText(linea2);
+        detalle3.setText(linea3);
     }
 
     void restaurarMensaje() {
         titulo.setText("Hover para ver el artista/evento");
         imagen.setIcon(null);
+        detalle1.setText("Eventos disponibles · Artistas destacados");
+        detalle2.setText("Pasa el cursor por los mosaicos para ver stats");
+        detalle3.setText("Compra, imprime y comparte con BoletaMaster");
+    }
+
+    private JLabel crearDetalleLabel() {
+        JLabel lbl = new JLabel("", JLabel.CENTER);
+        lbl.setForeground(new Color(230, 240, 255));
+        lbl.setFont(lbl.getFont().deriveFont(java.awt.Font.PLAIN, 11.5f));
+        return lbl;
     }
 }
 
@@ -675,9 +750,9 @@ class LoginPanel extends JPanel {
 
     private LoginHandler handler;
 
-    private final List<String> eventos;
+    private final List<Evento> eventos;
 
-    public LoginPanel(List<String> eventos) {
+    public LoginPanel(List<Evento> eventos) {
         super(new BorderLayout());
         this.eventos = eventos == null ? List.of() : eventos;
         construir();
