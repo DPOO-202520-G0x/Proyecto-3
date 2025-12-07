@@ -431,7 +431,7 @@ class AvatarPreviewPanel extends JPanel {
     private final JTextArea descripcion;
     private final JTextArea descripcionExtra;
     private final JPanel badgesPanel;
-    private final JLabel premios;
+    private final JTextArea premios;
     private final JLabel avatar;
     private final JTextArea infoProyecto;
 
@@ -481,10 +481,19 @@ class AvatarPreviewPanel extends JPanel {
         badgesPanel.setOpaque(false);
         badgesPanel.setBorder(new EmptyBorder(6, 8, 6, 8));
 
-        premios = new JLabel("", JLabel.CENTER);
+        premios = new JTextArea();
+        premios.setEditable(false);
+        premios.setOpaque(false);
         premios.setForeground(new Color(239, 247, 255));
         premios.setFont(premios.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
-        premios.setBorder(new EmptyBorder(6, 8, 6, 8));
+        premios.setBorder(new EmptyBorder(10, 12, 10, 12));
+        premios.setLineWrap(true);
+        premios.setWrapStyleWord(true);
+        premios.setRows(6);
+        premios.setAlignmentX(CENTER_ALIGNMENT);
+        premios.setMaximumSize(new Dimension(260, 140));
+        premios.setPreferredSize(new Dimension(250, 120));
+        premios.setMinimumSize(new Dimension(240, 110));
 
         JPanel tarjeta = new JPanel() {
             @Override
