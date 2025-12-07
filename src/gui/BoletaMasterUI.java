@@ -368,21 +368,7 @@ class BannerPanel extends JPanel {
     }
 
     private String envolverInfo(String texto) {
-        if (texto == null) {
-            return "";
-        }
-        String[] partes = texto.split("·");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < partes.length; i++) {
-            if (i > 0) {
-                sb.append(" · ");
-            }
-            sb.append(partes[i].trim());
-            if (i < partes.length - 1) {
-                sb.append("\n");
-            }
-        }
-        return sb.toString();
+        return "<html><div style='text-align:center;width:230px;'>" + texto + "</div></html>";
     }
 
     private double calcularRecaudo(Evento evento) {
