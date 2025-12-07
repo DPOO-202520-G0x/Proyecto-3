@@ -85,7 +85,7 @@ Con esos pasos podrás revisar desde Eclipse los mismos flujos de impresión, tr
 ### ¿Cómo abrir y probar la GUI (Swing) en Eclipse?
 1. **Ubica la clase principal**: en `src/gui/BoletaMasterUI.java` hay un `main` listo para ejecutar.
 2. **Confirma el *working directory***: en `Run > Run Configurations... > Java Application > (BoletaMasterUI)` establece el *Working directory* al directorio raíz del proyecto (`TALLER_3`). Esto asegura que la ruta relativa `data/` se resuelva y el estado se cargue/guarde.
-3. **Ejecuta**: clic derecho sobre `BoletaMasterUI` → **Run As > Java Application**. Se abrirá la ventana Swing con la pantalla de login (incluye el banner de BoletaMaster) y, al imprimir una boleta, verás una vista previa con QR escaneable y arte promocional generado en tiempo real (sin depender de archivos binarios).
+3. **Ejecuta**: clic derecho sobre `BoletaMasterUI` → **Run As > Java Application**. Se abrirá la ventana Swing con la pantalla de login (banner generativo sin binarios externos) y, al imprimir una boleta, verás una vista previa con QR escaneable y arte promocional vectorial listo para usarse sin archivos adicionales.
 4. **Credenciales de ejemplo**:
    - Administrador: usuario `ronny`, contraseña `ronny`.
    - Organizadores: `org01`/`org01`, `org02`/`org02`, `org03`/`org03`.

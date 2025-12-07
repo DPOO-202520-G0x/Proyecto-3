@@ -27,15 +27,23 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.AlphaComposite;
 import java.awt.CardLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.util.Random;
+import java.awt.image.RescaleOp;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -219,6 +227,17 @@ class TicketPreviewDialog {
 }
 
 class BannerPanel extends JPanel {
+
+    private final Color[] paleta = new Color[]{
+            new Color(16, 38, 91),
+            new Color(29, 99, 155),
+            new Color(255, 193, 7),
+            new Color(245, 71, 119)
+    };
+
+    BannerPanel() {
+        setPreferredSize(new Dimension(560, 500));
+        setOpaque(false);
     BannerPanel() {
         setPreferredSize(new Dimension(520, 400));
     }
@@ -229,43 +248,109 @@ class BannerPanel extends JPanel {
         var g2 = (java.awt.Graphics2D) g.create();
         g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
 
-        java.awt.GradientPaint grad = new java.awt.GradientPaint(0, 0, new java.awt.Color(30, 61, 127),
-                getWidth(), getHeight(), new java.awt.Color(116, 199, 255));
-        g2.setPaint(grad);
+        // Fondo generativo sin binarios: degradado y manchas suaves
+        g2.setPaint(new GradientPaint(0, 0, new Color(22, 12, 53), getWidth(), getHeight(), new Color(58, 120, 196)));
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), 32, 32);
 
-        g2.setColor(new java.awt.Color(255, 255, 255, 180));
-        g2.fillRoundRect(40, 40, getWidth() - 80, getHeight() - 80, 24, 24);
+        g2.setComposite(AlphaComposite.SrcOver.derive(0.12f));
+        var rnd = new Random(7);
+        for (int i = 0; i < 14; i++) {
+            int w = 120 + rnd.nextInt(120);
+            int h = 80 + rnd.nextInt(140);
+            int x = rnd.nextInt(Math.max(1, getWidth() - w));
+            int y = rnd.nextInt(Math.max(1, getHeight() - h));
+            g2.setPaint(new GradientPaint(x, y,
+                    paleta[rnd.nextInt(paleta.length)],
+                    x + w, y + h,
+                    paleta[rnd.nextInt(paleta.length)]));
+            g2.fillRoundRect(x, y, w, h, 26, 26);
+        }
+        g2.setComposite(AlphaComposite.SrcOver);
 
-        g2.setColor(new java.awt.Color(16, 38, 91));
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 32f));
-        g2.drawString("BoletaMaster", 70, 120);
+        g2.setPaint(new GradientPaint(0, 0, new Color(10, 25, 60, 200),
+                0, getHeight(), new Color(0, 0, 0, 180)));
+        g2.fillRoundRect(18, 18, getWidth() - 36, getHeight() - 36, 32, 32);
 
-        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 18f));
-        g2.drawString("Empresa dedicada a la venta de tiquetes", 70, 155);
-        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 15f));
-        g2.drawString("Eventos en vivo, deportes y cultura con acceso inmediato.", 70, 185);
+        int blockWidth = Math.min(getWidth() - 120, 420);
+        int blockX = 48;
+        int blockY = 60;
 
-        g2.setColor(new java.awt.Color(247, 198, 62));
-        g2.fillRoundRect(70, 230, getWidth() - 140, 110, 20, 20);
-        g2.setColor(new java.awt.Color(51, 25, 7));
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 20f));
-        g2.drawString("Artista destacado: Estrella Invitada", 90, 270);
+        g2.setColor(new Color(255, 255, 255, 238));
+        g2.fillRoundRect(blockX, blockY, blockWidth, 220, 20, 20);
+
+        g2.setColor(new Color(16, 38, 91));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 30f));
+        g2.drawString("BoletaMaster", blockX + 24, blockY + 52);
+
+        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 16f));
+        drawParrafo(g2,
+                "Empresa dedicada a la venta de tiquetes con artistas en vivo, festivales y deportes.",
+                blockX + 24, blockY + 80, blockWidth - 48, 22);
+
+        int highlightY = blockY + 128;
+        g2.setColor(new Color(255, 183, 77));
+        g2.fillRoundRect(blockX + 16, highlightY, blockWidth - 32, 72, 16, 16);
+        g2.setColor(new Color(51, 25, 7));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 17f));
+        g2.drawString("Artistas top: Shakira · Karol G · J Balvin", blockX + 28, highlightY + 30);
         g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 14f));
-        g2.drawString("¡Compra y administra tus tiquetes desde una misma ventana!", 90, 300);
+        g2.drawString("Compra y administra tus tiquetes sin filas", blockX + 28, highlightY + 52);
 
-        g2.setColor(new java.awt.Color(255, 255, 255, 160));
-        for (int i = 0; i < 8; i++) {
-            int x = 80 + i * 50;
-            int y = 60 + (i % 2 == 0 ? 0 : 18);
-            g2.fillOval(x, y, 12, 12);
+        // Tarjetas estilizadas sin imágenes binarias
+        int cardW = blockWidth;
+        int cardH = 160;
+        int cardX = blockX;
+        int cardY = blockY + 240;
+        g2.setColor(new Color(255, 255, 255, 235));
+        g2.fillRoundRect(cardX, cardY, cardW, cardH, 18, 18);
+
+        g2.setColor(new Color(35, 54, 96));
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        g2.drawString("Cartel destacado", cardX + 18, cardY + 32);
+
+        String[] chips = {"Fonseca", "Morat", "Grupo Niche", "Karol G", "Shakira"};
+        int chipX = cardX + 18;
+        int chipY = cardY + 60;
+        for (String chip : chips) {
+            int chipW = g2.getFontMetrics().stringWidth(chip) + 24;
+            g2.setColor(new Color(245, 71, 119, 200));
+            g2.fillRoundRect(chipX, chipY, chipW, 30, 14, 14);
+            g2.setColor(Color.WHITE);
+            g2.drawString(chip, chipX + 12, chipY + 21);
+            chipX += chipW + 10;
+            if (chipX + chipW > cardX + cardW - 20) {
+                chipX = cardX + 18;
+                chipY += 38;
+            }
         }
 
         g2.dispose();
     }
+
+    private void drawParrafo(java.awt.Graphics2D g2, String texto, int x, int y, int width, int lineHeight) {
+        FontMetrics fm = g2.getFontMetrics();
+        String[] palabras = texto.split(" ");
+        StringBuilder linea = new StringBuilder();
+        int cursorY = y;
+        for (String palabra : palabras) {
+            String candidata = linea.length() == 0 ? palabra : linea + " " + palabra;
+            if (fm.stringWidth(candidata) > width) {
+                g2.drawString(linea.toString(), x, cursorY);
+                linea = new StringBuilder(palabra);
+                cursorY += lineHeight;
+            } else {
+                linea = new StringBuilder(candidata);
+            }
+        }
+        if (!linea.isEmpty()) {
+            g2.drawString(linea.toString(), x, cursorY);
+        }
+    }
+
 }
 
 class PosterPanel extends JPanel {
+
     PosterPanel() {
         setPreferredSize(new Dimension(450, 480));
     }
@@ -276,41 +361,38 @@ class PosterPanel extends JPanel {
         var g2 = (java.awt.Graphics2D) g.create();
         g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
 
-        java.awt.GradientPaint fondo = new java.awt.GradientPaint(0, 0, new java.awt.Color(13, 12, 50),
-                getWidth(), getHeight(), new java.awt.Color(88, 31, 94));
+        GradientPaint fondo = new GradientPaint(0, 0, new Color(10, 0, 36),
+                getWidth(), getHeight(), new Color(91, 35, 121));
         g2.setPaint(fondo);
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), 28, 28);
 
-        g2.setColor(new java.awt.Color(255, 193, 7, 200));
-        g2.fillRoundRect(30, 40, getWidth() - 60, getHeight() - 80, 22, 22);
+        // Poster ilustrado sin JPG/PNG externos
+        g2.setColor(new Color(255, 193, 7, 230));
+        g2.fillRoundRect(32, 36, getWidth() - 64, 120, 18, 18);
+        g2.setColor(new Color(245, 71, 119, 200));
+        g2.fillRoundRect(52, 178, getWidth() - 104, 86, 18, 18);
+        g2.setColor(new Color(74, 217, 217, 180));
+        g2.fillRoundRect(42, 280, getWidth() - 84, 140, 18, 18);
 
-        g2.setColor(new java.awt.Color(33, 25, 10));
+        g2.setColor(Color.WHITE);
         g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 26f));
-        g2.drawString("Vista previa BoletaMaster", 50, 90);
+        g2.drawString("BoletaMaster en vivo", 54, 82);
 
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 20f));
-        g2.drawString("Artista invitado: Legend Live", 50, 130);
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 19f));
+        g2.drawString("Shakira · Karol G · Juanes", 54, 112);
 
-        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 15f));
-        g2.drawString("Escucha los éxitos y accede al show con tu QR único.", 50, 160);
+        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 14f));
+        g2.drawString("Prepara tu QR único y disfruta el show sin filas.", 54, 138);
 
-        g2.setColor(new java.awt.Color(0, 0, 0, 30));
-        for (int i = 0; i < 6; i++) {
-            int baseY = 190 + i * 40;
-            g2.fillRoundRect(50, baseY, getWidth() - 120, 26, 16, 16);
+        g2.setColor(new Color(255, 255, 255, 160));
+        for (int i = 0; i < 7; i++) {
+            int baseY = 210 + i * 32;
+            g2.fillRoundRect(64, baseY, getWidth() - 128, 22, 14, 14);
         }
 
-        g2.setColor(new java.awt.Color(255, 255, 255, 120));
-        for (int i = 0; i < 9; i++) {
-            int x = 70 + (i * 40) % (getWidth() - 140);
-            int y = 220 + (i * 35) % (getHeight() - 200);
-            int size = 30 + (i % 3) * 8;
-            g2.fillOval(x, y, size, size);
-        }
-
-        g2.setColor(new java.awt.Color(33, 25, 10));
+        g2.setColor(Color.WHITE);
         g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 16f));
-        g2.drawString("Escanea el QR para validar tu entrada", 50, getHeight() - 60);
+        g2.drawString("Escanea el QR para validar tu entrada", 64, getHeight() - 56);
 
         g2.dispose();
     }
@@ -332,14 +414,18 @@ class LoginPanel extends JPanel {
     }
 
     private void construir() {
+        setBackground(new java.awt.Color(243, 245, 252));
+
         JPanel formulario = new JPanel(new GridBagLayout());
-        formulario.setBorder(new EmptyBorder(20, 20, 20, 20));
+        formulario.setOpaque(false);
+        formulario.setBorder(new EmptyBorder(30, 20, 30, 20));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         javax.swing.JLabel titulo = new javax.swing.JLabel("BoletaMaster · Empresa dedicada a la venta de tiquetes");
-        titulo.setFont(titulo.getFont().deriveFont(16f));
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 17f));
+        titulo.setForeground(new java.awt.Color(35, 54, 96));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -347,7 +433,9 @@ class LoginPanel extends JPanel {
 
         gbc.gridwidth = 1;
         gbc.gridy = 1;
-        formulario.add(new javax.swing.JLabel("Rol:"), gbc);
+        JLabel lblRol = new javax.swing.JLabel("Rol:");
+        lblRol.setForeground(new java.awt.Color(35, 54, 96));
+        formulario.add(lblRol, gbc);
 
         JComboBox<RolSeleccionado> roles = new JComboBox<>(RolSeleccionado.values());
         gbc.gridx = 1;
@@ -355,7 +443,9 @@ class LoginPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        formulario.add(new javax.swing.JLabel("Usuario:"), gbc);
+        JLabel lblUser = new javax.swing.JLabel("Usuario:");
+        lblUser.setForeground(new java.awt.Color(35, 54, 96));
+        formulario.add(lblUser, gbc);
 
         JTextField loginField = new JTextField(20);
         gbc.gridx = 1;
@@ -363,13 +453,20 @@ class LoginPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        formulario.add(new javax.swing.JLabel("Contraseña:"), gbc);
+        JLabel lblPass = new javax.swing.JLabel("Contraseña:");
+        lblPass.setForeground(new java.awt.Color(35, 54, 96));
+        formulario.add(lblPass, gbc);
 
         JPasswordField passwordField = new JPasswordField(20);
         gbc.gridx = 1;
         formulario.add(passwordField, gbc);
 
         JButton ingresar = new JButton("Ingresar a BoletaMaster");
+        ingresar.setBackground(new java.awt.Color(45, 136, 255));
+        ingresar.setForeground(java.awt.Color.WHITE);
+        ingresar.setFocusPainted(false);
+        ingresar.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
+        ingresar.setFont(ingresar.getFont().deriveFont(java.awt.Font.BOLD, 14f));
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
@@ -383,11 +480,22 @@ class LoginPanel extends JPanel {
             }
         });
 
+        JPanel contenedor = new JPanel(new BorderLayout());
+        contenedor.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(16, 12, 16, 12),
+                BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(220, 225, 237))));
+
+        JLabel subtitulo = new JLabel("Inicio de sesión rápido");
+        subtitulo.setFont(subtitulo.getFont().deriveFont(java.awt.Font.PLAIN, 13f));
+        subtitulo.setForeground(new java.awt.Color(92, 105, 128));
+        contenedor.add(subtitulo, BorderLayout.NORTH);
+        contenedor.add(formulario, BorderLayout.CENTER);
+
         BannerPanel banner = new BannerPanel();
         banner.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         add(banner, BorderLayout.WEST);
-        add(formulario, BorderLayout.CENTER);
+        add(contenedor, BorderLayout.CENTER);
     }
 
     public void setOnLogin(LoginHandler handler) {
