@@ -441,7 +441,6 @@ class AvatarPreviewPanel extends JPanel {
     private final JTextArea descripcionExtra;
     private final JPanel badgesPanel;
     private final JTextArea premios;
-    private final JScrollPane premiosScroll;
     private final JLabel avatar;
     private final JTextArea infoProyecto;
 
@@ -505,16 +504,6 @@ class AvatarPreviewPanel extends JPanel {
         premios.setPreferredSize(new Dimension(260, 360));
         premios.setMinimumSize(new Dimension(250, 260));
 
-        premiosScroll = new JScrollPane(premios);
-        premiosScroll.setOpaque(false);
-        premiosScroll.getViewport().setOpaque(false);
-        premiosScroll.setBorder(BorderFactory.createEmptyBorder());
-        premiosScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        premiosScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        premiosScroll.setPreferredSize(new Dimension(270, 380));
-        premiosScroll.setMaximumSize(new Dimension(280, 440));
-        premiosScroll.setMinimumSize(new Dimension(260, 260));
-
         JPanel tarjeta = new JPanel() {
             @Override
             protected void paintComponent(java.awt.Graphics g) {
@@ -539,7 +528,7 @@ class AvatarPreviewPanel extends JPanel {
         tarjeta.add(descripcion);
         tarjeta.add(descripcionExtra);
         tarjeta.add(badgesPanel);
-        tarjeta.add(premiosScroll);
+        tarjeta.add(premios);
 
         add(titulo, BorderLayout.NORTH);
         add(tarjeta, BorderLayout.CENTER);
