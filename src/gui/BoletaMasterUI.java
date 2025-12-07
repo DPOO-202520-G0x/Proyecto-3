@@ -252,12 +252,12 @@ class BannerPanel extends JPanel {
         carousel = new TileCarousel(extraerNombresEventos(), artistas);
         avatares = crearAvatares();
 
-        JLabel titulo = new JLabel("<html><div style='text-align:center;'>"
-                + "<div style='font-size:22px;font-weight:850;letter-spacing:1px;'>BOLETAMASTER</div>"
-                + "<div style='font-size:13px;font-weight:700;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
+        JLabel titulo = new JLabel("<html><div style='text-align:center;'>" 
+                + "<div style='font-size:19px;font-weight:850;letter-spacing:0.5px;'>BOLETAMASTER</div>" 
+                + "<div style='font-size:12px;font-weight:700;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
                 + "</div></html>", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
-        titulo.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        titulo.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
         titulo.setVerticalAlignment(JLabel.CENTER);
 
         JPanel headerBadge = new JPanel(new BorderLayout()) {
@@ -273,10 +273,10 @@ class BannerPanel extends JPanel {
             }
         };
         headerBadge.setOpaque(false);
-        headerBadge.setBorder(new EmptyBorder(8, 14, 8, 14));
-        headerBadge.setPreferredSize(new Dimension(660, 70));
-        headerBadge.setMinimumSize(new Dimension(620, 64));
-        headerBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 86));
+        headerBadge.setBorder(new EmptyBorder(6, 12, 6, 12));
+        headerBadge.setPreferredSize(new Dimension(640, 64));
+        headerBadge.setMinimumSize(new Dimension(600, 60));
+        headerBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 78));
         headerBadge.add(titulo, BorderLayout.CENTER);
 
         JPanel contenido = new JPanel(new BorderLayout());
