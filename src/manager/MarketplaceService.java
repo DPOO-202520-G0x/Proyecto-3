@@ -86,6 +86,9 @@ public class MarketplaceService {
             if (!Objects.equals(tiquete.getCliente(), vendedor)) {
                 throw new IllegalArgumentException("El tiquete " + id + " no pertenece al vendedor");
             }
+            if (tiquete.estaImpreso()) {
+                throw new IllegalArgumentException("El tiquete " + id + " ya fue impreso y no puede revenderse");
+            }
             if (deluxe.contains(id)) {
                 throw new IllegalArgumentException("El tiquete " + id + " pertenece a un paquete Deluxe y no puede revenderse");
             }
