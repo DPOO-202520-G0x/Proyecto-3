@@ -476,8 +476,10 @@ class AvatarPreviewPanel extends JPanel {
         descripcionExtra.setRows(4);
         descripcionExtra.setMaximumSize(new Dimension(260, 150));
 
-        badgesPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 6));
+        badgesPanel = new JPanel();
+        badgesPanel.setLayout(new javax.swing.BoxLayout(badgesPanel, javax.swing.BoxLayout.Y_AXIS));
         badgesPanel.setOpaque(false);
+        badgesPanel.setBorder(new EmptyBorder(6, 8, 6, 8));
 
         premios = new JLabel("", JLabel.CENTER);
         premios.setForeground(new Color(239, 247, 255));
@@ -581,12 +583,16 @@ class AvatarPreviewPanel extends JPanel {
                 ? List.of("Headliner", "Gira global", "Colaboraciones")
                 : logros;
         for (String logro : entradas) {
-            JLabel chip = new JLabel(logro.toUpperCase());
+            String wrapped = String.format("<html><div style='width:%dpx;text-align:left;'>%s</div></html>",
+                    218, logro.toUpperCase());
+            JLabel chip = new JLabel(wrapped);
             chip.setOpaque(true);
-            chip.setBackground(new Color(255, 255, 255, 200));
+            chip.setBackground(new Color(255, 255, 255, 215));
             chip.setForeground(new Color(35, 54, 96));
             chip.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
             chip.setFont(chip.getFont().deriveFont(java.awt.Font.BOLD, 11f));
+            chip.setAlignmentX(LEFT_ALIGNMENT);
+            chip.setMaximumSize(new Dimension(Integer.MAX_VALUE, chip.getPreferredSize().height + 2));
             badgesPanel.add(chip);
         }
         badgesPanel.revalidate();
