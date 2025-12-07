@@ -1,10 +1,13 @@
 package tiquetes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import Cliente.Cliente;
 import eventos.Evento;
 import eventos.Localidad;
+import tiquetes.DatosImpresion;
 /**
  * Clase base abstracta para todos los tiquetes de BoletaMaster.
  * <p>
@@ -28,6 +31,8 @@ public abstract class Tiquete {
     private Localidad localidad;
     private Evento evento;
     private Cliente cliente;
+    private boolean impreso;
+    private LocalDateTime fechaImpresion;
     /**
      * Construye un tiquete con sus datos de contexto y valores económicos.
      *
@@ -126,6 +131,47 @@ public abstract class Tiquete {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
+
+    /**
+     * Indica si el tiquete ya fue impreso al menos una vez.
+     */
+    public boolean estaImpreso() {
+        return impreso;
+    }
+
+    /**
+     * Fecha y hora en la que se imprimió el tiquete por primera vez.
+     * Devuelve {@code null} si aún no se ha impreso.
+     */
+    public LocalDateTime getFechaImpresion() {
+        return fechaImpresion;
+    }
+
+    /**
+     * Genera una representación imprimible del tiquete y marca que ya fue impreso.
+     * La representación incluye los datos clave y un bloque de datos que puede
+     * alimentarse a un generador de códigos QR externo.
+     *
+     * @return cadena con la información a imprimir.
+     * @throws IllegalStateException si el tiquete ya había sido impreso.
+     */
+    public synchronized String imprimir() {
+        return imprimirConDatos().comoTexto();
+    }
+
+    /**
+     * Variante estructurada que devuelve un objeto con toda la información de
+     * impresión, incluyendo el payload plano para generar el QR.
+     */
+    public synchronized DatosImpresion imprimirConDatos() {
+        if (impreso) {
+            throw new IllegalStateException("El tiquete ya fue impreso");
+        }
+        this.impreso = true;
+        this.fechaImpresion = LocalDateTime.now();
+        return construirTiqueteParaImpresion();
+    }
+
     /**
      * Calcula el valor total del tiquete como suma del precio base,
      * el cargo por servicio y el cargo de emisión.
@@ -134,5 +180,32 @@ public abstract class Tiquete {
      */
     public double calcularValorTotal() {
         return precio + cargoServicio + cargoEmision;
+    }
+
+    private DatosImpresion construirTiqueteParaImpresion() {
+        String fechaEvento = String.format("%s %s", evento.getFecha(), evento.getHora());
+        String fechaImpresionLegible = fechaImpresion.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        String localidadNombre = localidad != null ? localidad.getNombre() : "N/D";
+        String qrData = generarContenidoQR(fechaEvento, fechaImpresionLegible, localidadNombre);
+        return new DatosImpresion(
+                idTiquete,
+                evento.getNombre(),
+                evento.getIdEvento(),
+                fechaEvento,
+                fechaImpresionLegible,
+                localidadNombre,
+                calcularValorTotal(),
+                qrData
+        );
+    }
+
+    private String generarContenidoQR(String fechaEvento, String fechaImpresionLegible, String localidadNombre) {
+        return new StringBuilder()
+                .append("Evento:").append(evento.getNombre()).append(" (").append(evento.getIdEvento()).append(")\n")
+                .append("ID:").append(idTiquete).append('\n')
+                .append("Localidad:").append(localidadNombre).append('\n')
+                .append("F.Evento:").append(fechaEvento).append('\n')
+                .append("F.Impresión:").append(fechaImpresionLegible)
+                .toString();
     }
 }
