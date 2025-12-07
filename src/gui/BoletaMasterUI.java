@@ -583,8 +583,7 @@ class AvatarPreviewPanel extends JPanel {
                 ? List.of("Headliner", "Gira global", "Colaboraciones")
                 : logros;
         for (String logro : entradas) {
-            String wrapped = String.format("<html><div style='width:%dpx;text-align:left;'>%s</div></html>",
-                    218, logro.toUpperCase());
+            String wrapped = formatearLogro(logro);
             JLabel chip = new JLabel(wrapped);
             chip.setOpaque(true);
             chip.setBackground(new Color(255, 255, 255, 215));
@@ -592,11 +591,41 @@ class AvatarPreviewPanel extends JPanel {
             chip.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
             chip.setFont(chip.getFont().deriveFont(java.awt.Font.BOLD, 11f));
             chip.setAlignmentX(LEFT_ALIGNMENT);
-            chip.setMaximumSize(new Dimension(Integer.MAX_VALUE, chip.getPreferredSize().height + 2));
+            chip.setMaximumSize(new Dimension(240, Integer.MAX_VALUE));
+            chip.setPreferredSize(new Dimension(230, chip.getPreferredSize().height + 8));
             badgesPanel.add(chip);
         }
         badgesPanel.revalidate();
         badgesPanel.repaint();
+    }
+
+    private String formatearLogro(String logro) {
+        String limpio = limpiarHtml(logro == null ? "" : logro).trim();
+        if (limpio.isBlank()) {
+            limpio = "Destacado";
+        }
+        String envuelto = envolverPalabras(limpio.toUpperCase(), 18);
+        return String.format("<html><div style='max-width:%dpx;text-align:left;white-space:normal;word-wrap:break-word;'>%s</div></html>",
+                222, envuelto);
+    }
+
+    private String envolverPalabras(String texto, int maxPorLinea) {
+        StringBuilder sb = new StringBuilder();
+        int longitudActual = 0;
+        for (String palabra : texto.split("\\s+")) {
+            if (longitudActual + palabra.length() + (longitudActual == 0 ? 0 : 1) > maxPorLinea) {
+                sb.append("<br>");
+                sb.append(palabra);
+                longitudActual = palabra.length();
+            } else {
+                if (longitudActual > 0) {
+                    sb.append(' ');
+                }
+                sb.append(palabra);
+                longitudActual += palabra.length() + (longitudActual == 0 ? 0 : 1);
+            }
+        }
+        return sb.toString();
     }
 
     private String generarPremios(String nombre) {
