@@ -419,7 +419,7 @@ class AvatarPreviewPanel extends JPanel {
     private final JPanel badgesPanel;
     private final JLabel premios;
     private final JLabel avatar;
-    private final JLabel infoProyecto;
+    private final JTextArea infoProyecto;
 
     AvatarPreviewPanel() {
         super(new BorderLayout());
@@ -499,10 +499,17 @@ class AvatarPreviewPanel extends JPanel {
         add(titulo, BorderLayout.NORTH);
         add(tarjeta, BorderLayout.CENTER);
 
-        infoProyecto = new JLabel("", JLabel.CENTER);
+        infoProyecto = new JTextArea();
+        infoProyecto.setEditable(false);
+        infoProyecto.setOpaque(false);
         infoProyecto.setForeground(new Color(16, 32, 64));
         infoProyecto.setFont(infoProyecto.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
-        infoProyecto.setBorder(new EmptyBorder(8, 10, 8, 10));
+        infoProyecto.setBorder(new EmptyBorder(8, 10, 10, 10));
+        infoProyecto.setLineWrap(true);
+        infoProyecto.setWrapStyleWord(true);
+        infoProyecto.setRows(3);
+        infoProyecto.setFocusable(false);
+        infoProyecto.setAlignmentX(CENTER_ALIGNMENT);
 
         JPanel franja = new JPanel(new BorderLayout()) {
             @Override
@@ -518,7 +525,8 @@ class AvatarPreviewPanel extends JPanel {
             }
         };
         franja.setOpaque(false);
-        franja.setBorder(new EmptyBorder(6, 4, 6, 4));
+        franja.setBorder(new EmptyBorder(8, 6, 8, 6));
+        franja.setPreferredSize(new Dimension(260, 64));
         franja.add(infoProyecto, BorderLayout.CENTER);
 
         add(franja, BorderLayout.SOUTH);
