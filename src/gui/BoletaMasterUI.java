@@ -441,14 +441,13 @@ class AvatarPreviewPanel extends JPanel {
     private final JTextArea descripcionExtra;
     private final JPanel badgesPanel;
     private final JTextArea premios;
-    private final JScrollPane premiosScroll;
     private final JLabel avatar;
     private final JTextArea infoProyecto;
 
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(280, 780));
+        setPreferredSize(new Dimension(300, 940));
 
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
@@ -472,8 +471,8 @@ class AvatarPreviewPanel extends JPanel {
         descripcion.setLineWrap(true);
         descripcion.setWrapStyleWord(true);
         descripcion.setBorder(new EmptyBorder(4, 10, 4, 10));
-        descripcion.setRows(6);
-        descripcion.setMaximumSize(new Dimension(260, 210));
+        descripcion.setRows(8);
+        descripcion.setMaximumSize(new Dimension(280, 260));
 
         descripcionExtra = new JTextArea();
         descripcionExtra.setEditable(false);
@@ -483,8 +482,8 @@ class AvatarPreviewPanel extends JPanel {
         descripcionExtra.setLineWrap(true);
         descripcionExtra.setWrapStyleWord(true);
         descripcionExtra.setBorder(new EmptyBorder(0, 10, 6, 10));
-        descripcionExtra.setRows(4);
-        descripcionExtra.setMaximumSize(new Dimension(260, 150));
+        descripcionExtra.setRows(5);
+        descripcionExtra.setMaximumSize(new Dimension(280, 190));
 
         badgesPanel = new JPanel();
         badgesPanel.setLayout(new javax.swing.BoxLayout(badgesPanel, javax.swing.BoxLayout.Y_AXIS));
@@ -499,21 +498,11 @@ class AvatarPreviewPanel extends JPanel {
         premios.setBorder(new EmptyBorder(10, 12, 10, 12));
         premios.setLineWrap(true);
         premios.setWrapStyleWord(true);
-        premios.setRows(18);
+        premios.setRows(22);
         premios.setAlignmentX(CENTER_ALIGNMENT);
-        premios.setMaximumSize(new Dimension(270, 420));
-        premios.setPreferredSize(new Dimension(260, 360));
-        premios.setMinimumSize(new Dimension(250, 260));
-
-        premiosScroll = new JScrollPane(premios);
-        premiosScroll.setOpaque(false);
-        premiosScroll.getViewport().setOpaque(false);
-        premiosScroll.setBorder(BorderFactory.createEmptyBorder());
-        premiosScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        premiosScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        premiosScroll.setPreferredSize(new Dimension(270, 380));
-        premiosScroll.setMaximumSize(new Dimension(280, 440));
-        premiosScroll.setMinimumSize(new Dimension(260, 260));
+        premios.setMaximumSize(new Dimension(280, 520));
+        premios.setPreferredSize(new Dimension(280, 440));
+        premios.setMinimumSize(new Dimension(260, 320));
 
         JPanel tarjeta = new JPanel() {
             @Override
@@ -539,7 +528,7 @@ class AvatarPreviewPanel extends JPanel {
         tarjeta.add(descripcion);
         tarjeta.add(descripcionExtra);
         tarjeta.add(badgesPanel);
-        tarjeta.add(premiosScroll);
+        tarjeta.add(premios);
 
         add(titulo, BorderLayout.NORTH);
         add(tarjeta, BorderLayout.CENTER);
@@ -552,7 +541,7 @@ class AvatarPreviewPanel extends JPanel {
         infoProyecto.setBorder(new EmptyBorder(8, 10, 10, 10));
         infoProyecto.setLineWrap(true);
         infoProyecto.setWrapStyleWord(true);
-        infoProyecto.setRows(7);
+        infoProyecto.setRows(9);
         infoProyecto.setFocusable(false);
         infoProyecto.setAlignmentX(CENTER_ALIGNMENT);
 
