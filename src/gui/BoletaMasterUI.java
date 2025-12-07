@@ -350,9 +350,9 @@ class BannerPanel extends JPanel {
                 String capacidad = evento.getCapacidadMaxima() > 0
                         ? Integer.toString(evento.getCapacidadMaxima())
                         : "capacidad por anunciar";
-                String infoProyecto = String.format("Proyecto: %s · Vendidos %d/%s · %s %s",
+                String infoProyecto = envolverInfo(String.format("%s · Vendidos %d/%s · %s %s",
                         evento.getNombre(), evento.getVendidos(), capacidad,
-                        evento.getFecha(), evento.getHora());
+                        evento.getFecha(), evento.getHora()));
 
                 preview.actualizarNarrativa(item, avatares.get(item),
                         preview.generarLogrosCortos(item),
@@ -360,9 +360,13 @@ class BannerPanel extends JPanel {
             } else {
                 preview.actualizarNarrativa(item, avatares.get(item),
                         preview.generarLogrosCortos(item),
-                        "Proyecto: cartel global en rotación");
+                        envolverInfo("Cartel global en rotación con artistas invitados"));
             }
         }
+    }
+
+    private String envolverInfo(String texto) {
+        return "<html><div style='text-align:center;width:230px;'>" + texto + "</div></html>";
     }
 
     private Evento buscarEvento(String nombre) {
@@ -411,9 +415,8 @@ class BannerPanel extends JPanel {
 class AvatarPreviewPanel extends JPanel {
     private final JLabel titulo;
     private final JLabel destacado;
-    private final JLabel detalle1;
-    private final JLabel detalle2;
-    private final JLabel detalle3;
+    private final JTextArea descripcion;
+    private final JPanel badgesPanel;
     private final JLabel premios;
     private final JLabel avatar;
     private final JLabel infoProyecto;
@@ -421,22 +424,42 @@ class AvatarPreviewPanel extends JPanel {
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(240, 460));
+        setPreferredSize(new Dimension(260, 500));
 
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 14.5f));
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 15f));
         titulo.setBorder(new EmptyBorder(6, 0, 6, 0));
 
         destacado = new JLabel("", JLabel.CENTER);
         destacado.setForeground(new Color(255, 236, 179));
-        destacado.setFont(destacado.getFont().deriveFont(java.awt.Font.BOLD, 13f));
+        destacado.setFont(destacado.getFont().deriveFont(java.awt.Font.BOLD, 14f));
+        destacado.setBorder(new EmptyBorder(2, 6, 6, 6));
 
         avatar = new JLabel();
         avatar.setHorizontalAlignment(JLabel.CENTER);
         avatar.setBorder(new EmptyBorder(4, 0, 6, 0));
 
-        JPanel tarjeta = new JPanel(new GridBagLayout()) {
+        descripcion = new JTextArea();
+        descripcion.setEditable(false);
+        descripcion.setOpaque(false);
+        descripcion.setForeground(new Color(228, 236, 250));
+        descripcion.setFont(descripcion.getFont().deriveFont(java.awt.Font.PLAIN, 12.5f));
+        descripcion.setLineWrap(true);
+        descripcion.setWrapStyleWord(true);
+        descripcion.setBorder(new EmptyBorder(4, 10, 4, 10));
+        descripcion.setRows(4);
+        descripcion.setMaximumSize(new Dimension(230, 120));
+
+        badgesPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 6));
+        badgesPanel.setOpaque(false);
+
+        premios = new JLabel("", JLabel.CENTER);
+        premios.setForeground(new Color(239, 247, 255));
+        premios.setFont(premios.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
+        premios.setBorder(new EmptyBorder(6, 8, 6, 8));
+
+        JPanel tarjeta = new JPanel() {
             @Override
             protected void paintComponent(java.awt.Graphics g) {
                 super.paintComponent(g);
@@ -452,50 +475,50 @@ class AvatarPreviewPanel extends JPanel {
             }
         };
         tarjeta.setOpaque(false);
-        tarjeta.setBorder(new EmptyBorder(12, 10, 12, 10));
+        tarjeta.setBorder(new EmptyBorder(12, 12, 12, 12));
+        tarjeta.setLayout(new javax.swing.BoxLayout(tarjeta, javax.swing.BoxLayout.Y_AXIS));
 
-        detalle1 = crearDetalleLabel();
-        detalle2 = crearDetalleLabel();
-        detalle3 = crearDetalleLabel();
-        premios = crearDetalleLabel();
-        premios.setFont(premios.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(6, 8, 6, 8);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        tarjeta.add(avatar, gbc);
-        gbc.gridy++;
-        tarjeta.add(destacado, gbc);
-        gbc.gridy++;
-        tarjeta.add(detalle1, gbc);
-        gbc.gridy++;
-        tarjeta.add(detalle2, gbc);
-        gbc.gridy++;
-        tarjeta.add(detalle3, gbc);
-        gbc.gridy++;
-        tarjeta.add(premios, gbc);
+        tarjeta.add(avatar);
+        tarjeta.add(destacado);
+        tarjeta.add(descripcion);
+        tarjeta.add(badgesPanel);
+        tarjeta.add(premios);
 
         add(titulo, BorderLayout.NORTH);
         add(tarjeta, BorderLayout.CENTER);
 
         infoProyecto = new JLabel("", JLabel.CENTER);
-        infoProyecto.setForeground(new Color(220, 230, 245));
-        infoProyecto.setFont(infoProyecto.getFont().deriveFont(java.awt.Font.BOLD, 11.5f));
-        infoProyecto.setBorder(new EmptyBorder(8, 4, 10, 4));
-        add(infoProyecto, BorderLayout.SOUTH);
+        infoProyecto.setForeground(new Color(16, 32, 64));
+        infoProyecto.setFont(infoProyecto.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
+        infoProyecto.setBorder(new EmptyBorder(8, 10, 8, 10));
+
+        JPanel franja = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                super.paintComponent(g);
+                var g2 = (java.awt.Graphics2D) g.create();
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 224, 138, 220),
+                        getWidth(), 0, new Color(255, 178, 102, 230));
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
+                g2.dispose();
+            }
+        };
+        franja.setOpaque(false);
+        franja.setBorder(new EmptyBorder(6, 4, 6, 4));
+        franja.add(infoProyecto, BorderLayout.CENTER);
+
+        add(franja, BorderLayout.SOUTH);
 
         restaurarMensaje();
     }
 
     void actualizarNarrativa(String nombre, ImageIcon icon, List<String> logros, String infoExterior) {
         titulo.setText(nombre);
-        destacado.setText(generarDescripcion(nombre));
-        detalle1.setText(logros.size() > 0 ? logros.get(0) : "");
-        detalle2.setText(logros.size() > 1 ? logros.get(1) : "");
-        detalle3.setText(logros.size() > 2 ? logros.get(2) : "");
+        destacado.setText(generarDescripcionCorta(nombre));
+        descripcion.setText(generarNarrativaExtendida(nombre));
+        actualizarBadges(logros);
         premios.setText(generarPremios(nombre));
         avatar.setIcon(icon);
         infoProyecto.setText(infoExterior);
@@ -504,50 +527,84 @@ class AvatarPreviewPanel extends JPanel {
     void restaurarMensaje() {
         titulo.setText("Hover para ver el artista/evento");
         destacado.setText("Artistas globales y eventos top en BoletaMaster");
-        detalle1.setText("Descubre recitales, festivales y temporadas de teatro");
-        detalle2.setText("Pasa el cursor por los mosaicos para ver estadísticas");
-        detalle3.setText("Compra, imprime tu QR y disfruta del show");
+        descripcion.setText("Descubre recitales, festivales y temporadas de teatro."
+                + " Pasa el cursor por los mosaicos para leer reseñas dinámicas.");
+        actualizarBadges(List.of("Cartel internacional", "Experiencia inmersiva", "Setlist de hits"));
         premios.setText("Premios y reconocimientos aparecerán aquí");
         avatar.setIcon(null);
-        infoProyecto.setText("Info del proyecto aparecerá aquí");
+        infoProyecto.setText("Datos reales del evento aparecerán aquí abajo");
     }
 
-    private JLabel crearDetalleLabel() {
-        JLabel lbl = new JLabel("", JLabel.CENTER);
-        lbl.setForeground(new Color(230, 240, 255));
-        lbl.setFont(lbl.getFont().deriveFont(java.awt.Font.PLAIN, 12f));
-        return lbl;
+    private void actualizarBadges(List<String> logros) {
+        badgesPanel.removeAll();
+        List<String> entradas = logros.isEmpty()
+                ? List.of("Headliner", "Gira global", "Colaboraciones")
+                : logros;
+        for (String logro : entradas) {
+            JLabel chip = new JLabel(logro.toUpperCase());
+            chip.setOpaque(true);
+            chip.setBackground(new Color(255, 255, 255, 200));
+            chip.setForeground(new Color(35, 54, 96));
+            chip.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+            chip.setFont(chip.getFont().deriveFont(java.awt.Font.BOLD, 11f));
+            badgesPanel.add(chip);
+        }
+        badgesPanel.revalidate();
+        badgesPanel.repaint();
     }
 
     private String generarPremios(String nombre) {
         String[] premiosPosibles = {
-                "3× Grammy Latino", "2× Billboard", "Disco de Platino", "Artista del Año", "Headliner de festivales",
-                "Gira Sold Out", "Premio Lo Nuestro", "Sesiones MTV", "Top 10 Streaming", "Premio Shock"
+                "Latingram a Álbum del Año", "Billboard Tour Estelar", "Premio Shock a Artista del Público", "Sesión MTV Unplugged",
+                "Embajador streaming global", "Headliner de festivales andinos", "Gira sold out en 12 ciudades", "Colaboración viral en TikTok"
         };
         int hash = Math.abs(nombre.hashCode());
-        return "Premios/Trayectoria: " + premiosPosibles[hash % premiosPosibles.length];
+        return premiosPosibles[hash % premiosPosibles.length];
     }
 
-    private String generarDescripcion(String nombre) {
+    private String generarDescripcionCorta(String nombre) {
         String[] descripciones = {
-                "Headliner global", "Revelación en vivo",
-                "Tour mundial", "Multi-premiado", "Colaboraciones top",
-                "Fusión de géneros", "Experiencia inmersiva", "Setlist de hits"
+                "Show envolvente con visuales inmersivos",
+                "Fusión de ritmos latinos y pop alternativo",
+                "Narrativa poderosa con banda en vivo",
+                "Setlist curado para cantar de principio a fin",
+                "Coreografías icónicas y coros masivos",
+                "Invitados sorpresa y arreglos exclusivos"
         };
         int idx = Math.abs(nombre.toLowerCase().hashCode()) % descripciones.length;
         return descripciones[idx];
     }
 
+    private String generarNarrativaExtendida(String nombre) {
+        String[] textos = {
+                "Leyenda del pop que recorre su catálogo con arreglos acústicos y momentos íntimos para el público.",
+                "Artista colombiano que mezcla folk, electrónica y ritmos urbanos, con visuales inspirados en paisajes andinos.",
+                "Banda que se reinventó con un tour de estadio, coreografías vibrantes y mensajes de diversidad cultural.",
+                "Show que alterna himnos de estadio con baladas premiadas, reforzando su legado en premios internacionales.",
+                "Presentación inmersiva con pantallas 360°, invitados sorpresa y un setlist diseñado para cantar a grito herido.",
+                "Proyecto que celebra sus colaboraciones globales y estrena un sencillo exclusivo para la gira BoletaMaster."
+        };
+        int idx = Math.abs((nombre + " narrativa").hashCode()) % textos.length;
+        return textos[idx];
+    }
+
     List<String> generarLogrosCortos(String nombre) {
         String[] logros = {
-                "Grammy Latino", "Billboard", "Sesión MTV", "Gira SoldOut", "Top Spotify",
-                "Headliner", "Premio Shock", "Tour Andes", "Show viral", "Colab global"
+                "Grammy Latino a Mejor Álbum Pop",
+                "Billboard Hot Tour",
+                "Sesión MTV en vivo",
+                "Gira SoldOut Bogotá/Medellín",
+                "Top 5 Spotify Colombia",
+                "Headliner Estéreo Picnic",
+                "Premio Shock a la innovación",
+                "Colaboración global con DJs",
+                "Banda sonora de serie", "Tendencia TikTok"
         };
         Random r = new Random(Math.abs(nombre.hashCode()));
-        return java.util.stream.IntStream.range(0, 3)
+        return java.util.stream.IntStream.range(0, 4)
                 .mapToObj(i -> logros[(r.nextInt(logros.length))])
                 .distinct()
-                .limit(3)
+                .limit(4)
                 .collect(Collectors.toList());
     }
 }
