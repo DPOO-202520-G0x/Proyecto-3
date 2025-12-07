@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Fachada principal del sistema BoletaMaster.
@@ -149,6 +150,18 @@ public class BoletaMasterSystem {
             return Collections.emptyList();
         }
         return organizador.getEventos();
+    }
+
+    public Collection<Evento> getTodosLosEventos() {
+        return Collections.unmodifiableCollection(requireState().getEventosPorId().values());
+    }
+
+    public List<String> getNombresEventosOrdenados() {
+        return getTodosLosEventos().stream()
+                .map(Evento::getNombre)
+                .filter(Objects::nonNull)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     private MarketplaceService marketplace() {
