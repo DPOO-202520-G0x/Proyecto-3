@@ -238,6 +238,8 @@ class BannerPanel extends JPanel {
     BannerPanel() {
         setPreferredSize(new Dimension(560, 500));
         setOpaque(false);
+    BannerPanel() {
+        setPreferredSize(new Dimension(520, 400));
     }
 
     @Override
