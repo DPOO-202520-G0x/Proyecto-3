@@ -252,13 +252,12 @@ class BannerPanel extends JPanel {
         carousel = new TileCarousel(extraerNombresEventos(), artistas);
         avatares = crearAvatares();
 
-        String tituloHtml = "<html><div style='text-align:center;width:560px;'>"
-                + "<div style='font-size:20px;font-weight:900;letter-spacing:0.5px;'>BOLETAMASTER</div>"
-                + "<div style='font-size:13px;font-weight:750;line-height:1.2em;'>Tu boletería oficial para conciertos,<br>festivales y teatros</div>"
-                + "</div></html>";
-        JLabel titulo = new JLabel(tituloHtml, JLabel.CENTER);
+        JLabel titulo = new JLabel("<html><div style='text-align:center;'>" 
+                + "<div style='font-size:19px;font-weight:850;letter-spacing:0.5px;'>BOLETAMASTER</div>" 
+                + "<div style='font-size:12px;font-weight:700;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
+                + "</div></html>", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
-        titulo.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+        titulo.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
         titulo.setVerticalAlignment(JLabel.CENTER);
 
         JPanel headerBadge = new JPanel(new BorderLayout()) {
@@ -274,10 +273,10 @@ class BannerPanel extends JPanel {
             }
         };
         headerBadge.setOpaque(false);
-        headerBadge.setBorder(new EmptyBorder(8, 14, 8, 14));
-        headerBadge.setPreferredSize(new Dimension(660, 86));
-        headerBadge.setMinimumSize(new Dimension(620, 80));
-        headerBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 96));
+        headerBadge.setBorder(new EmptyBorder(6, 12, 6, 12));
+        headerBadge.setPreferredSize(new Dimension(640, 64));
+        headerBadge.setMinimumSize(new Dimension(600, 60));
+        headerBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 78));
         headerBadge.add(titulo, BorderLayout.CENTER);
 
         JPanel contenido = new JPanel(new BorderLayout());
