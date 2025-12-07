@@ -123,6 +123,9 @@ public class Cliente extends Usuario {
         if (tiqueteATransferir == null) {
             return false;
         }
+        if (tiqueteATransferir.estaImpreso()) {
+            return false;
+        }
         tiquetes.remove(tiqueteATransferir);
         receptor.agregarTiquete(tiqueteATransferir);
         tiqueteATransferir.setCliente(receptor);
