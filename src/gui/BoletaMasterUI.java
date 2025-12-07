@@ -244,25 +244,21 @@ class BannerPanel extends JPanel {
                 : eventosDisponibles;
         this.artistas = List.of("Shakira", "Karol G", "Juanes", "Fonseca", "Morat", "Carlos Vives");
         setOpaque(false);
-        setPreferredSize(new Dimension(680, 540));
-        setLayout(new BorderLayout(12, 8));
+        setPreferredSize(new Dimension(720, 520));
+        setLayout(new BorderLayout(10, 6));
 
         preview = new AvatarPreviewPanel();
         logo = new RotatingLogo();
         carousel = new TileCarousel(extraerNombresEventos(), artistas);
         avatares = crearAvatares();
 
-        JPanel header = new JPanel(new BorderLayout());
-        header.setOpaque(false);
-        header.setBorder(new EmptyBorder(8, 14, 6, 14));
-
-        JLabel titulo = new JLabel("<html><div style='text-align:left;'>"
-                + "<div style='font-size:24px;font-weight:800;line-height:1.05;'>BOLETAMASTER</div>"
-                + "<div style='font-size:14px;font-weight:600;line-height:1.05;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
-                + "</div></html>", JLabel.LEFT);
+        JLabel titulo = new JLabel("<html><div style='text-align:center;'>"
+                + "<div style='font-size:22px;font-weight:850;letter-spacing:1px;'>BOLETAMASTER</div>"
+                + "<div style='font-size:13px;font-weight:700;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
+                + "</div></html>", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
-        titulo.setBorder(BorderFactory.createEmptyBorder(4, 10, 6, 10));
-        titulo.setVerticalAlignment(JLabel.TOP);
+        titulo.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        titulo.setVerticalAlignment(JLabel.CENTER);
 
         JPanel headerBadge = new JPanel(new BorderLayout()) {
             @Override
@@ -277,26 +273,26 @@ class BannerPanel extends JPanel {
             }
         };
         headerBadge.setOpaque(false);
-        headerBadge.setBorder(new EmptyBorder(10, 12, 10, 12));
-        headerBadge.setPreferredSize(new Dimension(520, 84));
+        headerBadge.setBorder(new EmptyBorder(8, 14, 8, 14));
+        headerBadge.setPreferredSize(new Dimension(660, 70));
+        headerBadge.setMinimumSize(new Dimension(620, 64));
+        headerBadge.setMaximumSize(new Dimension(Integer.MAX_VALUE, 86));
         headerBadge.add(titulo, BorderLayout.CENTER);
-
-        header.add(headerBadge, BorderLayout.CENTER);
 
         JPanel contenido = new JPanel(new BorderLayout());
         contenido.setOpaque(false);
-        contenido.setBorder(new EmptyBorder(12, 18, 12, 18));
+        contenido.setBorder(new EmptyBorder(10, 16, 10, 10));
 
         JPanel pistaCarrusel = new JPanel(new BorderLayout());
         pistaCarrusel.setOpaque(false);
         pistaCarrusel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(255, 255, 255, 90), 1, true),
-                new EmptyBorder(14, 14, 14, 14)));
-        carousel.setPreferredSize(new Dimension(560, 280));
+                new EmptyBorder(12, 12, 12, 12)));
+        carousel.setPreferredSize(new Dimension(600, 300));
         carousel.setHoverListener(this::actualizarPreviewDesdeCarousel);
         pistaCarrusel.add(carousel, BorderLayout.CENTER);
 
-        contenido.add(header, BorderLayout.NORTH);
+        contenido.add(headerBadge, BorderLayout.NORTH);
         contenido.add(pistaCarrusel, BorderLayout.CENTER);
 
         add(contenido, BorderLayout.CENTER);
