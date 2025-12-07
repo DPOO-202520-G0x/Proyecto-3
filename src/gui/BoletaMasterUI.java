@@ -296,7 +296,15 @@ class BannerPanel extends JPanel {
         contenido.add(pistaCarrusel, BorderLayout.CENTER);
 
         add(contenido, BorderLayout.CENTER);
-        add(preview, BorderLayout.EAST);
+
+        JScrollPane previewScroll = new JScrollPane(preview);
+        previewScroll.setOpaque(false);
+        previewScroll.getViewport().setOpaque(false);
+        previewScroll.setBorder(BorderFactory.createEmptyBorder());
+        previewScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        previewScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        previewScroll.setPreferredSize(preview.getPreferredSize());
+        add(previewScroll, BorderLayout.EAST);
         add(logo, BorderLayout.SOUTH);
     }
 
