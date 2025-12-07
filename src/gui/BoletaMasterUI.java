@@ -256,10 +256,13 @@ class BannerPanel extends JPanel {
         header.setOpaque(false);
         header.setBorder(new EmptyBorder(16, 18, 10, 18));
 
-        JLabel titulo = new JLabel("BOLETAMASTER · Tu boletería oficial para conciertos, festivales y teatros", JLabel.LEFT);
+        JLabel titulo = new JLabel("<html><div style='text-align:left;'>"
+                + "<div style='font-size:28px;font-weight:800;'>BOLETAMASTER</div>"
+                + "<div style='font-size:16px;font-weight:500;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
+                + "</div></html>", JLabel.LEFT);
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 26f));
         titulo.setBorder(BorderFactory.createEmptyBorder(6, 10, 10, 10));
+        titulo.setVerticalAlignment(JLabel.TOP);
 
         JPanel headerBadge = new JPanel(new BorderLayout()) {
             @Override
@@ -275,6 +278,7 @@ class BannerPanel extends JPanel {
         };
         headerBadge.setOpaque(false);
         headerBadge.setBorder(new EmptyBorder(12, 14, 12, 14));
+        headerBadge.setPreferredSize(new Dimension(680, 92));
         headerBadge.add(titulo, BorderLayout.CENTER);
 
         header.add(headerBadge, BorderLayout.CENTER);
