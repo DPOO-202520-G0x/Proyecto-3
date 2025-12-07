@@ -486,13 +486,14 @@ class AvatarPreviewPanel extends JPanel {
         premios.setOpaque(false);
         premios.setForeground(new Color(239, 247, 255));
         premios.setFont(premios.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
-        premios.setBorder(new EmptyBorder(8, 10, 8, 10));
+        premios.setBorder(new EmptyBorder(10, 12, 10, 12));
         premios.setLineWrap(true);
         premios.setWrapStyleWord(true);
-        premios.setRows(3);
+        premios.setRows(6);
         premios.setAlignmentX(CENTER_ALIGNMENT);
-        premios.setMaximumSize(new Dimension(240, 80));
-        premios.setPreferredSize(new Dimension(230, 70));
+        premios.setMaximumSize(new Dimension(260, 140));
+        premios.setPreferredSize(new Dimension(250, 120));
+        premios.setMinimumSize(new Dimension(240, 110));
 
         JPanel tarjeta = new JPanel() {
             @Override
