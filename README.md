@@ -85,7 +85,7 @@ Con esos pasos podrás revisar desde Eclipse los mismos flujos de impresión, tr
 ### ¿Cómo abrir y probar la GUI (Swing) en Eclipse?
 1. **Ubica la clase principal**: en `src/gui/BoletaMasterUI.java` hay un `main` listo para ejecutar.
 2. **Confirma el *working directory***: en `Run > Run Configurations... > Java Application > (BoletaMasterUI)` establece el *Working directory* al directorio raíz del proyecto (`TALLER_3`). Esto asegura que la ruta relativa `data/` se resuelva y el estado se cargue/guarde.
-3. **Ejecuta**: clic derecho sobre `BoletaMasterUI` → **Run As > Java Application**. Se abrirá la ventana Swing con la pantalla de login (banner generativo sin binarios externos) y, al imprimir una boleta, verás una vista previa con QR escaneable y arte promocional vectorial listo para usarse sin archivos adicionales.
+3. **Ejecuta**: clic derecho sobre `BoletaMasterUI` → **Run As > Java Application**. Verás la nueva pantalla de login con un banner animado (logo giratorio, carrusel de eventos y artistas que rota cada pocos segundos, chips hover que muestran un avatar ilustrado) y un formulario más limpio. Al imprimir una boleta, se abre la vista previa con póster dinámico y QR escaneable generados en tiempo real.
 4. **Credenciales de ejemplo**:
    - Administrador: usuario `ronny`, contraseña `ronny`.
    - Organizadores: `org01`/`org01`, `org02`/`org02`, `org03`/`org03`.
@@ -93,3 +93,14 @@ Con esos pasos podrás revisar desde Eclipse los mismos flujos de impresión, tr
 5. **Flujo de cierre**: al cerrar la ventana, el sistema invoca `guardarDatos()`; si hiciste pruebas que cambian el estado, los JSON en `data/` se actualizarán.
 
 Con esa configuración podrás validar desde Eclipse toda la interfaz gráfica Swing, sin pasos adicionales.
+
+## Ideas rápidas para seguir embelleciendo
+- **Tema oscuro/gradientes:** cambia la paleta (ahora neón/azul) por una variante morado-aguamarina o inspirada en festivales.
+- **Transiciones al cambiar de tarjeta:** anima la entrada del formulario con deslizamientos u opacidad progresiva (el carrusel ya usa `Timer`).
+- **Avatar por rol:** muestra un avatar distinto si el usuario escribe `cli`, `org` o `admin` en el campo de usuario antes de enviar.
+- **Fondos contextuales:** usa la localidad/tipo de evento del tiquete para pintar un fondo distinto en la vista previa (concierto, teatro, deporte).
+- **Botones elevados y hover:** añade sombra simulada y cambio de color al posar el mouse sobre “Ingresar”.
+- **Tipografía moderna:** embebe una fuente sans (Inter, Montserrat) en el classpath y aplícala con `deriveFont`.
+- **Marco para el QR:** dibuja un borde tipo “ticket” o esquinas redondeadas alrededor del QR para remarcarlo en la vista previa.
+- **Modo compacto:** botón para reconfigurar la ventana a 1200×720 o 1000×650 evitando cortes en portátiles.
+- **Breve spinner de impresión:** muestra una barra de progreso de 300–500 ms al generar el QR para reforzar que se está procesando.

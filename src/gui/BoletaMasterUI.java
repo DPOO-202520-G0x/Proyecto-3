@@ -33,10 +33,12 @@ import java.awt.CardLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
+import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import javax.swing.JComponent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -70,7 +72,7 @@ public class BoletaMasterUI extends JPanel {
     }
 
     private void construirUI() {
-        LoginPanel loginPanel = new LoginPanel();
+        LoginPanel loginPanel = new LoginPanel(sistema.getNombresEventosOrdenados());
         JPanel placeholder = new JPanel();
 
         cardPanel.add(loginPanel, "login");
@@ -229,16 +231,122 @@ class TicketPreviewDialog {
 
 class BannerPanel extends JPanel {
 
-    private final Color[] paleta = new Color[]{
-            new Color(16, 38, 91),
-            new Color(29, 99, 155),
-            new Color(255, 193, 7),
-            new Color(245, 71, 119)
-    };
+    private final List<String> eventos;
+    private final List<String> artistas;
+    private final AvatarPreviewPanel preview;
+    private final RotatingLogo logo;
+    private final CarouselBand carousel;
 
-    BannerPanel() {
-        setPreferredSize(new Dimension(560, 500));
+    BannerPanel(List<String> eventosDisponibles) {
+        this.eventos = eventosDisponibles == null || eventosDisponibles.isEmpty()
+                ? List.of("Concierto Andes", "Festival Pacífico", "Teatro Central", "Derby Andino")
+                : eventosDisponibles;
+        this.artistas = List.of("Shakira", "Karol G", "Juanes", "Fonseca", "Morat", "Carlos Vives");
         setOpaque(false);
+        setPreferredSize(new Dimension(620, 520));
+        setLayout(new BorderLayout(12, 12));
+
+        preview = new AvatarPreviewPanel();
+        logo = new RotatingLogo();
+        carousel = new CarouselBand(eventos, artistas);
+
+        JPanel contenido = new JPanel(new BorderLayout());
+        contenido.setOpaque(false);
+        contenido.setBorder(new EmptyBorder(28, 32, 28, 32));
+
+        contenido.add(crearCabecera(), BorderLayout.NORTH);
+        contenido.add(crearChipsInteractivos(), BorderLayout.CENTER);
+        contenido.add(carousel, BorderLayout.SOUTH);
+
+        add(contenido, BorderLayout.CENTER);
+        add(preview, BorderLayout.EAST);
+        add(logo, BorderLayout.SOUTH);
+    }
+
+    private JComponent crearCabecera() {
+        JPanel cabecera = new JPanel(new BorderLayout());
+        cabecera.setOpaque(false);
+        JLabel titulo = new JLabel("BoletaMaster · Vive tus eventos sin filas");
+        titulo.setForeground(new Color(238, 244, 255));
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 24f));
+        JLabel subtitulo = new JLabel("Venta de tiquetes para conciertos, deportes y teatro en una interfaz más viva");
+        subtitulo.setForeground(new Color(220, 230, 245));
+        subtitulo.setFont(subtitulo.getFont().deriveFont(java.awt.Font.PLAIN, 14f));
+
+        cabecera.add(titulo, BorderLayout.NORTH);
+        cabecera.add(subtitulo, BorderLayout.CENTER);
+        return cabecera;
+    }
+
+    private JPanel crearChipsInteractivos() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel seccionEventos = new JLabel("Eventos en rotación");
+        seccionEventos.setForeground(Color.WHITE);
+        seccionEventos.setFont(seccionEventos.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        panel.add(seccionEventos, gbc);
+
+        gbc.gridy++; gbc.gridwidth = 1;
+        panel.add(crearNube(eventos, new Color(245, 199, 83)), gbc);
+
+        gbc.gridx = 1;
+        panel.add(crearNube(artistas, new Color(111, 203, 255)), gbc);
+
+        return panel;
+    }
+
+    private JPanel crearNube(List<String> textos, Color base) {
+        JPanel nube = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        nube.setOpaque(false);
+        for (String texto : textos) {
+            JLabel chip = new JLabel(texto, crearAvatar(texto, base.darker()), JLabel.LEFT);
+            chip.setOpaque(true);
+            chip.setBackground(new Color(base.getRed(), base.getGreen(), base.getBlue(), 180));
+            chip.setForeground(new Color(18, 26, 48));
+            chip.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+            chip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            chip.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    preview.actualizar(texto, (ImageIcon) chip.getIcon());
+                    carousel.destacar(texto);
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    preview.restaurarMensaje();
+                    carousel.destacar(null);
+                }
+            });
+            nube.add(chip);
+        }
+        return nube;
+    }
+
+    private ImageIcon crearAvatar(String nombre, Color base) {
+        int size = 96;
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        var g2 = (java.awt.Graphics2D) img.getGraphics();
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        GradientPaint gp = new GradientPaint(0, 0, base, size, size, base.brighter());
+        g2.setPaint(gp);
+        g2.fillRoundRect(0, 0, size, size, 20, 20);
+        g2.setColor(new Color(255, 255, 255, 210));
+        g2.setFont(g2.getFont().deriveFont(java.awt.Font.BOLD, 28f));
+        String iniciales = nombre.length() <= 2 ? nombre.toUpperCase() : nombre.substring(0, 2).toUpperCase();
+        FontMetrics fm = g2.getFontMetrics();
+        int tx = (size - fm.stringWidth(iniciales)) / 2;
+        int ty = (size + fm.getAscent()) / 2 - 6;
+        g2.drawString(iniciales, tx, ty);
+        g2.setColor(new Color(0, 0, 0, 60));
+        g2.drawRoundRect(2, 2, size - 4, size - 4, 18, 18);
+        g2.dispose();
+        return new ImageIcon(img);
     }
 
     @Override
@@ -246,106 +354,154 @@ class BannerPanel extends JPanel {
         super.paintComponent(g);
         var g2 = (java.awt.Graphics2D) g.create();
         g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Fondo generativo sin binarios: degradado y manchas suaves
-        g2.setPaint(new GradientPaint(0, 0, new Color(22, 12, 53), getWidth(), getHeight(), new Color(58, 120, 196)));
+        g2.setPaint(new GradientPaint(0, 0, new Color(12, 18, 48), getWidth(), getHeight(), new Color(46, 109, 172)));
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), 32, 32);
-
-        g2.setComposite(AlphaComposite.SrcOver.derive(0.12f));
-        var rnd = new Random(7);
-        for (int i = 0; i < 14; i++) {
-            int w = 120 + rnd.nextInt(120);
-            int h = 80 + rnd.nextInt(140);
+        g2.setComposite(AlphaComposite.SrcOver.derive(0.08f));
+        var rnd = new Random(11);
+        for (int i = 0; i < 18; i++) {
+            int w = 90 + rnd.nextInt(120);
+            int h = 70 + rnd.nextInt(140);
             int x = rnd.nextInt(Math.max(1, getWidth() - w));
             int y = rnd.nextInt(Math.max(1, getHeight() - h));
             g2.setPaint(new GradientPaint(x, y,
-                    paleta[rnd.nextInt(paleta.length)],
+                    new Color(245, 71, 119, 140),
                     x + w, y + h,
-                    paleta[rnd.nextInt(paleta.length)]));
-            g2.fillRoundRect(x, y, w, h, 26, 26);
+                    new Color(255, 193, 7, 140)));
+            g2.fillRoundRect(x, y, w, h, 22, 22);
         }
-        g2.setComposite(AlphaComposite.SrcOver);
+        g2.dispose();
+    }
+}
 
-        g2.setPaint(new GradientPaint(0, 0, new Color(10, 25, 60, 200),
-                0, getHeight(), new Color(0, 0, 0, 180)));
-        g2.fillRoundRect(18, 18, getWidth() - 36, getHeight() - 36, 32, 32);
+class AvatarPreviewPanel extends JPanel {
+    private final JLabel titulo;
+    private final JLabel imagen;
 
-        int blockWidth = Math.min(getWidth() - 120, 420);
-        int blockX = 48;
-        int blockY = 60;
+    AvatarPreviewPanel() {
+        super(new BorderLayout());
+        setOpaque(false);
+        setPreferredSize(new Dimension(180, 420));
+        titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
+        titulo.setForeground(Color.WHITE);
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.PLAIN, 12f));
+        imagen = new JLabel();
+        imagen.setHorizontalAlignment(JLabel.CENTER);
+        imagen.setVerticalAlignment(JLabel.CENTER);
+        imagen.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 60)),
+                new EmptyBorder(14, 10, 14, 10)));
+        add(titulo, BorderLayout.NORTH);
+        add(imagen, BorderLayout.CENTER);
+    }
 
-        g2.setColor(new Color(255, 255, 255, 238));
-        g2.fillRoundRect(blockX, blockY, blockWidth, 220, 20, 20);
+    void actualizar(String nombre, ImageIcon icon) {
+        titulo.setText(nombre);
+        imagen.setIcon(icon);
+    }
 
-        g2.setColor(new Color(16, 38, 91));
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 30f));
-        g2.drawString("BoletaMaster", blockX + 24, blockY + 52);
+    void restaurarMensaje() {
+        titulo.setText("Hover para ver el artista/evento");
+        imagen.setIcon(null);
+    }
+}
 
-        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 16f));
-        drawParrafo(g2,
-                "Empresa dedicada a la venta de tiquetes con artistas en vivo, festivales y deportes.",
-                blockX + 24, blockY + 80, blockWidth - 48, 22);
+class RotatingLogo extends JPanel {
+    private double angulo = 0;
+    private final javax.swing.Timer timer;
 
-        int highlightY = blockY + 128;
-        g2.setColor(new Color(255, 183, 77));
-        g2.fillRoundRect(blockX + 16, highlightY, blockWidth - 32, 72, 16, 16);
-        g2.setColor(new Color(51, 25, 7));
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 17f));
-        g2.drawString("Artistas top: Shakira · Karol G · J Balvin", blockX + 28, highlightY + 30);
-        g2.setFont(getFont().deriveFont(java.awt.Font.PLAIN, 14f));
-        g2.drawString("Compra y administra tus tiquetes sin filas", blockX + 28, highlightY + 52);
+    RotatingLogo() {
+        setOpaque(false);
+        setPreferredSize(new Dimension(200, 120));
+        timer = new javax.swing.Timer(70, e -> {
+            angulo += Math.toRadians(3);
+            repaint();
+        });
+        timer.start();
+    }
 
-        // Tarjetas estilizadas sin imágenes binarias
-        int cardW = blockWidth;
-        int cardH = 160;
-        int cardX = blockX;
-        int cardY = blockY + 240;
-        g2.setColor(new Color(255, 255, 255, 235));
-        g2.fillRoundRect(cardX, cardY, cardW, cardH, 18, 18);
+    @Override
+    protected void paintComponent(java.awt.Graphics g) {
+        super.paintComponent(g);
+        var g2 = (java.awt.Graphics2D) g.create();
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        int cx = getWidth() / 2;
+        int cy = getHeight() / 2;
+        int r = Math.min(getWidth(), getHeight()) / 2 - 14;
 
-        g2.setColor(new Color(35, 54, 96));
-        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 16f));
-        g2.drawString("Cartel destacado", cardX + 18, cardY + 32);
+        g2.setColor(new Color(255, 255, 255, 40));
+        g2.fillOval(cx - r, cy - r, r * 2, r * 2);
+        g2.setStroke(new java.awt.BasicStroke(2f));
+        g2.setColor(new Color(245, 199, 83, 200));
+        g2.drawOval(cx - r, cy - r, r * 2, r * 2);
 
-        String[] chips = {"Fonseca", "Morat", "Grupo Niche", "Karol G", "Shakira"};
-        int chipX = cardX + 18;
-        int chipY = cardY + 60;
-        for (String chip : chips) {
-            int chipW = g2.getFontMetrics().stringWidth(chip) + 24;
-            g2.setColor(new Color(245, 71, 119, 200));
-            g2.fillRoundRect(chipX, chipY, chipW, 30, 14, 14);
-            g2.setColor(Color.WHITE);
-            g2.drawString(chip, chipX + 12, chipY + 21);
-            chipX += chipW + 10;
-            if (chipX + chipW > cardX + cardW - 20) {
-                chipX = cardX + 18;
-                chipY += 38;
+        for (int i = 0; i < 5; i++) {
+            double a = angulo + i * (Math.PI * 2 / 5);
+            int px = cx + (int) (Math.cos(a) * r);
+            int py = cy + (int) (Math.sin(a) * r);
+            g2.setColor(i % 2 == 0 ? new Color(245, 71, 119) : new Color(111, 203, 255));
+            g2.fillOval(px - 8, py - 8, 16, 16);
+        }
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(getFont().deriveFont(java.awt.Font.BOLD, 18f));
+        String texto = "BoletaMaster";
+        FontMetrics fm = g2.getFontMetrics();
+        g2.drawString(texto, cx - fm.stringWidth(texto) / 2, cy + fm.getAscent() / 2);
+        g2.dispose();
+    }
+}
+
+class CarouselBand extends JPanel {
+    private final List<String> items;
+    private final javax.swing.Timer timer;
+    private int offset = 0;
+    private String destacado;
+
+    CarouselBand(List<String> eventos, List<String> artistas) {
+        setOpaque(false);
+        setPreferredSize(new Dimension(400, 72));
+        this.items = concat(eventos, artistas);
+        timer = new javax.swing.Timer(2200, e -> {
+            offset = (offset + 1) % items.size();
+            repaint();
+        });
+        timer.start();
+    }
+
+    void destacar(String texto) {
+        this.destacado = texto;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(java.awt.Graphics g) {
+        super.paintComponent(g);
+        var g2 = (java.awt.Graphics2D) g.create();
+        g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(new Color(0, 0, 0, 50));
+        g2.fillRoundRect(0, 10, getWidth(), getHeight() - 20, 16, 16);
+        int x = 12;
+        int y = getHeight() / 2 + 6;
+        for (int i = 0; i < items.size(); i++) {
+            String texto = items.get((i + offset) % items.size());
+            boolean esDestacado = texto.equals(destacado);
+            Color base = esDestacado ? new Color(255, 193, 7) : new Color(255, 255, 255, 210);
+            g2.setColor(base);
+            int w = g2.getFontMetrics().stringWidth(texto) + 26;
+            if (x + w > getWidth() - 12) {
+                break;
             }
+            g2.fillRoundRect(x, y - 18, w, 32, 16, 16);
+            g2.setColor(esDestacado ? new Color(35, 54, 96) : new Color(12, 18, 48));
+            g2.drawString(texto, x + 12, y);
+            x += w + 10;
         }
-
         g2.dispose();
     }
 
-    private void drawParrafo(java.awt.Graphics2D g2, String texto, int x, int y, int width, int lineHeight) {
-        FontMetrics fm = g2.getFontMetrics();
-        String[] palabras = texto.split(" ");
-        StringBuilder linea = new StringBuilder();
-        int cursorY = y;
-        for (String palabra : palabras) {
-            String candidata = linea.length() == 0 ? palabra : linea + " " + palabra;
-            if (fm.stringWidth(candidata) > width) {
-                g2.drawString(linea.toString(), x, cursorY);
-                linea = new StringBuilder(palabra);
-                cursorY += lineHeight;
-            } else {
-                linea = new StringBuilder(candidata);
-            }
-        }
-        if (!linea.isEmpty()) {
-            g2.drawString(linea.toString(), x, cursorY);
-        }
+    private static List<String> concat(List<String> a, List<String> b) {
+        return java.util.stream.Stream.concat(a.stream(), b.stream()).toList();
     }
-
 }
 
 class PosterPanel extends JPanel {
@@ -452,8 +608,11 @@ class LoginPanel extends JPanel {
 
     private LoginHandler handler;
 
-    public LoginPanel() {
+    private final List<String> eventos;
+
+    public LoginPanel(List<String> eventos) {
         super(new BorderLayout());
+        this.eventos = eventos == null ? List.of() : eventos;
         construir();
     }
 
@@ -535,7 +694,7 @@ class LoginPanel extends JPanel {
         contenedor.add(subtitulo, BorderLayout.NORTH);
         contenedor.add(formulario, BorderLayout.CENTER);
 
-        BannerPanel banner = new BannerPanel();
+        BannerPanel banner = new BannerPanel(eventos);
         banner.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         add(banner, BorderLayout.WEST);
