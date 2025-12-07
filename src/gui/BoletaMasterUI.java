@@ -350,8 +350,10 @@ class BannerPanel extends JPanel {
                 String capacidad = evento.getCapacidadMaxima() > 0
                         ? Integer.toString(evento.getCapacidadMaxima())
                         : "capacidad por anunciar";
-                String infoProyecto = envolverInfo(String.format("%s · Vendidos %d/%s · %s %s",
-                        evento.getNombre(), evento.getVendidos(), capacidad,
+                double porcentaje = evento.getPorcentajeVenta();
+                double recaudo = calcularRecaudo(evento);
+                String infoProyecto = envolverInfo(String.format("%s · Vendidos %d/%s (%.1f%%) · Recaudo $%,.0f · %s %s",
+                        evento.getNombre(), evento.getVendidos(), capacidad, porcentaje, recaudo,
                         evento.getFecha(), evento.getHora()));
 
                 preview.actualizarNarrativa(item, avatares.get(item),
@@ -369,6 +371,12 @@ class BannerPanel extends JPanel {
         return "<html><div style='text-align:center;width:230px;'>" + texto + "</div></html>";
     }
 
+    private double calcularRecaudo(Evento evento) {
+        return evento.getTiquetes().stream()
+                .mapToDouble(Tiquete::calcularValorTotal)
+                .sum();
+    }
+
     private Evento buscarEvento(String nombre) {
         if (nombre == null) {
             return null;
@@ -377,15 +385,6 @@ class BannerPanel extends JPanel {
                 .filter(e -> nombre.equalsIgnoreCase(e.getNombre()))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private double calcularRecaudo(Evento evento) {
-        if (evento == null) {
-            return 0;
-        }
-        return evento.getTiquetes().stream()
-                .mapToDouble(t -> t.getPrecio() + t.getCargoServicio() + t.getCargoEmision())
-                .sum();
     }
 
     @Override
@@ -416,6 +415,7 @@ class AvatarPreviewPanel extends JPanel {
     private final JLabel titulo;
     private final JLabel destacado;
     private final JTextArea descripcion;
+    private final JTextArea descripcionExtra;
     private final JPanel badgesPanel;
     private final JLabel premios;
     private final JLabel avatar;
@@ -448,8 +448,19 @@ class AvatarPreviewPanel extends JPanel {
         descripcion.setLineWrap(true);
         descripcion.setWrapStyleWord(true);
         descripcion.setBorder(new EmptyBorder(4, 10, 4, 10));
-        descripcion.setRows(4);
-        descripcion.setMaximumSize(new Dimension(230, 120));
+        descripcion.setRows(5);
+        descripcion.setMaximumSize(new Dimension(240, 180));
+
+        descripcionExtra = new JTextArea();
+        descripcionExtra.setEditable(false);
+        descripcionExtra.setOpaque(false);
+        descripcionExtra.setForeground(new Color(213, 226, 247));
+        descripcionExtra.setFont(descripcionExtra.getFont().deriveFont(java.awt.Font.PLAIN, 12f));
+        descripcionExtra.setLineWrap(true);
+        descripcionExtra.setWrapStyleWord(true);
+        descripcionExtra.setBorder(new EmptyBorder(0, 10, 6, 10));
+        descripcionExtra.setRows(3);
+        descripcionExtra.setMaximumSize(new Dimension(240, 120));
 
         badgesPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 6));
         badgesPanel.setOpaque(false);
@@ -481,6 +492,7 @@ class AvatarPreviewPanel extends JPanel {
         tarjeta.add(avatar);
         tarjeta.add(destacado);
         tarjeta.add(descripcion);
+        tarjeta.add(descripcionExtra);
         tarjeta.add(badgesPanel);
         tarjeta.add(premios);
 
@@ -517,7 +529,11 @@ class AvatarPreviewPanel extends JPanel {
     void actualizarNarrativa(String nombre, ImageIcon icon, List<String> logros, String infoExterior) {
         titulo.setText(nombre);
         destacado.setText(generarDescripcionCorta(nombre));
-        descripcion.setText(generarNarrativaExtendida(nombre));
+        String narrativa = generarNarrativaExtendida(nombre);
+        SegmentoTexto segmentos = dividirNarrativa(narrativa);
+        descripcion.setText(segmentos.arriba());
+        descripcionExtra.setText(segmentos.abajo());
+        descripcionExtra.setVisible(!segmentos.abajo().isBlank());
         actualizarBadges(logros);
         premios.setText(generarPremios(nombre));
         avatar.setIcon(icon);
@@ -529,6 +545,8 @@ class AvatarPreviewPanel extends JPanel {
         destacado.setText("Artistas globales y eventos top en BoletaMaster");
         descripcion.setText("Descubre recitales, festivales y temporadas de teatro."
                 + " Pasa el cursor por los mosaicos para leer reseñas dinámicas.");
+        descripcionExtra.setText("Explora los detalles en la franja inferior: ventas, aforo y recaudo en tiempo real.");
+        descripcionExtra.setVisible(true);
         actualizarBadges(List.of("Cartel internacional", "Experiencia inmersiva", "Setlist de hits"));
         premios.setText("Premios y reconocimientos aparecerán aquí");
         avatar.setIcon(null);
@@ -588,6 +606,20 @@ class AvatarPreviewPanel extends JPanel {
         return textos[idx];
     }
 
+    private SegmentoTexto dividirNarrativa(String texto) {
+        int limite = 165;
+        if (texto.length() <= limite) {
+            return new SegmentoTexto(texto, "");
+        }
+        int corte = texto.lastIndexOf(' ', limite);
+        if (corte <= 0) {
+            corte = limite;
+        }
+        String arriba = texto.substring(0, corte).trim();
+        String abajo = texto.substring(corte).trim();
+        return new SegmentoTexto(arriba, abajo);
+    }
+
     List<String> generarLogrosCortos(String nombre) {
         String[] logros = {
                 "Grammy Latino a Mejor Álbum Pop",
@@ -606,6 +638,9 @@ class AvatarPreviewPanel extends JPanel {
                 .distinct()
                 .limit(4)
                 .collect(Collectors.toList());
+    }
+
+    private record SegmentoTexto(String arriba, String abajo) {
     }
 }
 
