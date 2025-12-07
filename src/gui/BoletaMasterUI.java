@@ -410,72 +410,114 @@ class BannerPanel extends JPanel {
 
 class AvatarPreviewPanel extends JPanel {
     private final JLabel titulo;
-    private final JLabel imagen;
+    private final JLabel destacado;
     private final JLabel detalle1;
     private final JLabel detalle2;
     private final JLabel detalle3;
+    private final JLabel premios;
 
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(180, 420));
+        setPreferredSize(new Dimension(220, 440));
+
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 13f));
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 14.5f));
+        titulo.setBorder(new EmptyBorder(6, 0, 6, 0));
 
-        imagen = new JLabel();
-        imagen.setHorizontalAlignment(JLabel.CENTER);
-        imagen.setVerticalAlignment(JLabel.CENTER);
-        imagen.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(255, 255, 255, 60)),
-                new EmptyBorder(14, 10, 14, 10)));
+        destacado = new JLabel("", JLabel.CENTER);
+        destacado.setForeground(new Color(255, 236, 179));
+        destacado.setFont(destacado.getFont().deriveFont(java.awt.Font.BOLD, 13f));
+
+        JPanel tarjeta = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                super.paintComponent(g);
+                var g2 = (java.awt.Graphics2D) g.create();
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(24, 44, 92, 210),
+                        getWidth(), getHeight(), new Color(38, 102, 142, 220));
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                g2.setColor(new Color(255, 255, 255, 60));
+                g2.drawRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 16, 16);
+                g2.dispose();
+            }
+        };
+        tarjeta.setOpaque(false);
+        tarjeta.setBorder(new EmptyBorder(12, 10, 12, 10));
 
         detalle1 = crearDetalleLabel();
         detalle2 = crearDetalleLabel();
         detalle3 = crearDetalleLabel();
+        premios = crearDetalleLabel();
+        premios.setFont(premios.getFont().deriveFont(java.awt.Font.BOLD, 12.5f));
 
-        JPanel detallePanel = new JPanel();
-        detallePanel.setOpaque(false);
-        detallePanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(4, 4, 4, 4);
+        gbc.insets = new Insets(6, 6, 6, 6);
         gbc.anchor = GridBagConstraints.CENTER;
-        detallePanel.add(detalle1, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        tarjeta.add(destacado, gbc);
         gbc.gridy++;
-        detallePanel.add(detalle2, gbc);
+        tarjeta.add(detalle1, gbc);
         gbc.gridy++;
-        detallePanel.add(detalle3, gbc);
+        tarjeta.add(detalle2, gbc);
+        gbc.gridy++;
+        tarjeta.add(detalle3, gbc);
+        gbc.gridy++;
+        tarjeta.add(premios, gbc);
 
         add(titulo, BorderLayout.NORTH);
-        add(imagen, BorderLayout.CENTER);
-        add(detallePanel, BorderLayout.SOUTH);
+        add(tarjeta, BorderLayout.CENTER);
 
         restaurarMensaje();
     }
 
     void actualizar(String nombre, ImageIcon icon, String linea1, String linea2, String linea3) {
         titulo.setText(nombre);
-        imagen.setIcon(icon);
+        destacado.setText(generarDescripcion(nombre));
         detalle1.setText(linea1);
         detalle2.setText(linea2);
         detalle3.setText(linea3);
+        premios.setText(generarPremios(nombre));
     }
 
     void restaurarMensaje() {
         titulo.setText("Hover para ver el artista/evento");
-        imagen.setIcon(null);
-        detalle1.setText("Eventos disponibles · Artistas destacados");
-        detalle2.setText("Pasa el cursor por los mosaicos para ver stats");
-        detalle3.setText("Compra, imprime y comparte con BoletaMaster");
+        destacado.setText("Artistas globales y eventos top en BoletaMaster");
+        detalle1.setText("Descubre recitales, festivales y temporadas de teatro");
+        detalle2.setText("Pasa el cursor por los mosaicos para ver estadísticas");
+        detalle3.setText("Compra, imprime tu QR y disfruta del show");
+        premios.setText("Premios y reconocimientos aparecerán aquí");
     }
 
     private JLabel crearDetalleLabel() {
         JLabel lbl = new JLabel("", JLabel.CENTER);
         lbl.setForeground(new Color(230, 240, 255));
-        lbl.setFont(lbl.getFont().deriveFont(java.awt.Font.PLAIN, 11.5f));
+        lbl.setFont(lbl.getFont().deriveFont(java.awt.Font.PLAIN, 12f));
         return lbl;
+    }
+
+    private String generarPremios(String nombre) {
+        String[] premiosPosibles = {
+                "3× Grammy Latino", "2× Billboard", "Disco de Platino", "Artista del Año", "Headliner de festivales",
+                "Gira Sold Out", "Premio Lo Nuestro", "Sesiones MTV", "Top 10 Streaming", "Premio Shock"
+        };
+        int hash = Math.abs(nombre.hashCode());
+        return "Premios/Trayectoria: " + premiosPosibles[hash % premiosPosibles.length];
+    }
+
+    private String generarDescripcion(String nombre) {
+        String[] descripciones = {
+                "Headliner global con shows épicos", "Revelación del año en vivo",
+                "Tour mundial en rotación", "Nominado a múltiples premios", "Colaboraciones con grandes estrellas",
+                "Sonido que mezcla géneros", "Pionero en experiencias inmersivas", "Setlist cargado de éxitos"
+        };
+        int idx = Math.abs(nombre.toLowerCase().hashCode()) % descripciones.length;
+        return descripciones[idx];
     }
 }
 
