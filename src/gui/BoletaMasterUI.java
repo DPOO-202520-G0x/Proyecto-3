@@ -254,7 +254,7 @@ class BannerPanel extends JPanel {
 
         JLabel titulo = new JLabel("<html><div style='text-align:center;'>" 
                 + "<div style='font-size:19px;font-weight:850;letter-spacing:0.5px;'>BOLETAMASTER</div>" 
-                + "<div style='font-size:12px;font-weight:700;'>Tu boletería oficial para conciertos, festivales y teatros</div>"
+                + "<div style='font-size:12px;font-weight:700;'>Tu boletería oficial</div>"
                 + "</div></html>", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
         titulo.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
@@ -447,9 +447,9 @@ class AvatarPreviewPanel extends JPanel {
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(320, 620));
+        setPreferredSize(new Dimension(320, 580));
 
-        titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
+        titulo = new JLabel("Mover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
         titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 15f));
         titulo.setBorder(new EmptyBorder(6, 0, 6, 0));
@@ -583,7 +583,7 @@ class AvatarPreviewPanel extends JPanel {
     }
 
     void restaurarMensaje() {
-        titulo.setText("Hover para ver el artista/evento");
+        titulo.setText("Mover para ver el artista/evento");
         destacado.setText("Artistas globales y eventos top en BoletaMaster");
         descripcion.setText("Descubre recitales, festivales y temporadas de teatro."
                 + " Pasa el cursor por los mosaicos para leer reseñas dinámicas.");

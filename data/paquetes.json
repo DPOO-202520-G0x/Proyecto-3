@@ -11,7 +11,9 @@
   },
   {
     "tipo": "DELUXE",
-    "tiquetesIncluidos": [302],
+    "tiquetesIncluidos": [
+      302
+    ],
     "beneficios": [
       "Backstage",
       "Camiseta exclusiva"

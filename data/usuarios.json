@@ -1,109 +1,113 @@
 {
   "administrador": {
     "idAdministrador": "ADM001",
-    "password": "ronny",
-    "cargosServicio": {
-      "CONCIERTO": 0,
-      "CULTURAL": 0,
-      "DEPORTIVO": 0,
-      "RELIGIOSO": 0
-    },
-    "ganancias": 0,
-    "venuesAprobados": [],
-    "saldo": 2000000,
+    "saldo": 2000000.0,
     "login": "ronny",
+    "password": "ronny",
     "nombre": "Juan Admin",
-    "cargoEmision": 0
+    "ganancias": 0.0,
+    "cargosServicio": {
+      "CONCIERTO": 0.0,
+      "CULTURAL": 0.0,
+      "RELIGIOSO": 0.0,
+      "DEPORTIVO": 0.0
+    },
+    "cargoEmision": 0.0,
+    "venuesAprobados": []
   },
   "clientes": [
     {
-      "password": "cli05",
       "idCliente": "CLI005",
-      "saldo": 275010,
+      "saldo": 275010.0,
       "login": "cli05",
+      "password": "cli05",
+      "nombre": "Sofía Deportista",
       "tiquetes": [
         401,
         402,
         202
-      ],
-      "nombre": "Sofía Deportista"
+      ]
     },
     {
-      "password": "cli04",
       "idCliente": "CLI004",
-      "saldo": 519940,
+      "saldo": 519940.0,
       "login": "cli04",
+      "password": "cli04",
+      "nombre": "Laura Impro",
       "tiquetes": [
         204,
         302
-      ],
-      "nombre": "Laura Impro"
+      ]
     },
     {
-      "password": "cli01",
       "idCliente": "CLI001",
-      "saldo": 290051,
+      "saldo": 290051.0,
       "login": "cli01",
+      "password": "cli01",
+      "nombre": "Pedro Cliente",
       "tiquetes": [
         403,
         101,
         203
-      ],
-      "nombre": "Pedro Cliente"
+      ]
     },
     {
-      "password": "cli03",
       "idCliente": "CLI003",
-      "saldo": 180000,
+      "saldo": 180000.0,
       "login": "cli03",
+      "password": "cli03",
+      "nombre": "Julián Festivalero",
       "tiquetes": [
         103,
         301
-      ],
-      "nombre": "Julián Festivalero"
+      ]
     },
     {
-      "password": "cli02",
       "idCliente": "CLI002",
-      "saldo": 459999,
+      "saldo": 459999.0,
       "login": "cli02",
+      "password": "cli02",
+      "nombre": "María Melómana",
       "tiquetes": [
         102,
         201
-      ],
-      "nombre": "María Melómana"
+      ]
     }
   ],
   "organizadores": [
     {
-      "password": "org01",
-      "finanzas": 250000,
-      "eventos": ["EV001"],
-      "saldo": 1000000,
+      "idOrganizador": "ORG001",
+      "saldo": 1000000.0,
       "login": "org01",
+      "password": "org01",
       "nombre": "Laura Organizadora",
-      "idOrganizador": "ORG001"
+      "finanzas": 250000.0,
+      "eventos": [
+        "EV001"
+      ]
     },
     {
-      "password": "org03",
-      "finanzas": 95000,
-      "eventos": ["EV003"],
-      "saldo": 640000,
+      "idOrganizador": "ORG003",
+      "saldo": 640000.0,
       "login": "org03",
+      "password": "org03",
       "nombre": "Camila Teatro",
-      "idOrganizador": "ORG003"
+      "finanzas": 95000.0,
+      "eventos": [
+        "EV003"
+      ]
     },
     {
+      "idOrganizador": "ORG002",
+      "saldo": 850000.0,
+      "login": "org02",
       "password": "org02",
-      "finanzas": 180000,
+      "nombre": "Ricardo Festivales",
+      "finanzas": 180000.0,
       "eventos": [
         "EV002",
         "EV004"
-      ],
-      "saldo": 850000,
-      "login": "org02",
-      "nombre": "Ricardo Festivales",
-      "idOrganizador": "ORG002"
+      ]
     }
   ]
 }
