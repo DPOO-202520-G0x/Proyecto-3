@@ -253,15 +253,41 @@ class BannerPanel extends JPanel {
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        header.setBorder(new EmptyBorder(12, 18, 4, 18));
-        JLabel titulo = new JLabel("Bienvenido a BoletaMaster", JLabel.LEFT);
+        header.setBorder(new EmptyBorder(16, 18, 10, 18));
+
+        JLabel titulo = new JLabel("BOLETAMASTER", JLabel.LEFT);
         titulo.setForeground(Color.WHITE);
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 20f));
-        JLabel subtitulo = new JLabel("Tu entrada a conciertos, festivales y más", JLabel.LEFT);
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 28f));
+        titulo.setBorder(BorderFactory.createEmptyBorder(2, 0, 6, 0));
+
+        JLabel subtitulo = new JLabel("¡Bienvenid@! Compra, imprime y vive tus eventos", JLabel.LEFT);
         subtitulo.setForeground(new Color(235, 242, 255));
-        subtitulo.setFont(subtitulo.getFont().deriveFont(java.awt.Font.PLAIN, 13f));
-        header.add(titulo, BorderLayout.NORTH);
-        header.add(subtitulo, BorderLayout.SOUTH);
+        subtitulo.setFont(subtitulo.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+
+        JPanel headerBadge = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                super.paintComponent(g);
+                var g2 = (java.awt.Graphics2D) g.create();
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(255, 214, 102, 210), getWidth(), getHeight(), new Color(255, 129, 91, 210));
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                g2.dispose();
+            }
+        };
+        headerBadge.setOpaque(false);
+        headerBadge.setBorder(new EmptyBorder(10, 16, 12, 16));
+        headerBadge.add(titulo, BorderLayout.NORTH);
+        headerBadge.add(subtitulo, BorderLayout.SOUTH);
+
+        JLabel slogan = new JLabel("Tu boletería oficial para conciertos, festivales y teatro", JLabel.LEFT);
+        slogan.setForeground(new Color(223, 234, 255));
+        slogan.setFont(slogan.getFont().deriveFont(java.awt.Font.PLAIN, 14f));
+        slogan.setBorder(new EmptyBorder(6, 0, 0, 0));
+
+        header.add(headerBadge, BorderLayout.CENTER);
+        header.add(slogan, BorderLayout.SOUTH);
 
         JPanel contenido = new JPanel(new BorderLayout());
         contenido.setOpaque(false);
@@ -429,16 +455,6 @@ class TileCarousel extends JPanel {
     private final javax.swing.Timer timer;
     private Consumer<String> hoverListener;
     private final java.util.List<TileButton> tiles = new java.util.ArrayList<>();
-    private final Color[] paleta = new Color[]{
-            new Color(255, 105, 97),
-            new Color(102, 204, 255),
-            new Color(255, 193, 7),
-            new Color(129, 199, 132),
-            new Color(186, 104, 200),
-            new Color(255, 112, 67),
-            new Color(72, 202, 228),
-            new Color(255, 152, 116)
-    };
     private int pagina = 0;
 
     TileCarousel(List<String> eventos, List<String> artistas) {
@@ -483,7 +499,7 @@ class TileCarousel extends JPanel {
         for (int i = 0; i < tiles.size(); i++) {
             int idx = (pagina * 4 + i) % items.size();
             String texto = items.get(idx);
-            Color color = paleta[idx % paleta.length];
+            Color color = generarColor(idx);
             TileButton btn = tiles.get(i);
             btn.setColor(color);
             btn.setText(texto.toUpperCase());
@@ -491,6 +507,13 @@ class TileCarousel extends JPanel {
         }
         revalidate();
         repaint();
+    }
+
+    private Color generarColor(int index) {
+        float hue = (index * 0.11f) % 1.0f;
+        float saturation = 0.70f;
+        float brightness = 0.95f;
+        return Color.getHSBColor(hue, saturation, brightness);
     }
 
     private void notificarHover(String texto) {
