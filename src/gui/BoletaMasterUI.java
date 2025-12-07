@@ -523,7 +523,7 @@ class AvatarPreviewPanel extends JPanel {
         infoProyecto.setBorder(new EmptyBorder(8, 10, 10, 10));
         infoProyecto.setLineWrap(true);
         infoProyecto.setWrapStyleWord(true);
-        infoProyecto.setRows(4);
+        infoProyecto.setRows(7);
         infoProyecto.setFocusable(false);
         infoProyecto.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -541,8 +541,8 @@ class AvatarPreviewPanel extends JPanel {
             }
         };
         franja.setOpaque(false);
-        franja.setBorder(new EmptyBorder(8, 6, 8, 6));
-        franja.setPreferredSize(new Dimension(260, 92));
+        franja.setBorder(new EmptyBorder(10, 8, 12, 8));
+        franja.setPreferredSize(new Dimension(260, 128));
         franja.add(infoProyecto, BorderLayout.CENTER);
 
         add(franja, BorderLayout.SOUTH);
