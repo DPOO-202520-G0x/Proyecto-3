@@ -438,7 +438,7 @@ class AvatarPreviewPanel extends JPanel {
     AvatarPreviewPanel() {
         super(new BorderLayout());
         setOpaque(false);
-        setPreferredSize(new Dimension(260, 500));
+        setPreferredSize(new Dimension(260, 660));
 
         titulo = new JLabel("Hover para ver el artista/evento", JLabel.CENTER);
         titulo.setForeground(Color.WHITE);
@@ -489,11 +489,11 @@ class AvatarPreviewPanel extends JPanel {
         premios.setBorder(new EmptyBorder(10, 12, 10, 12));
         premios.setLineWrap(true);
         premios.setWrapStyleWord(true);
-        premios.setRows(6);
+        premios.setRows(13);
         premios.setAlignmentX(CENTER_ALIGNMENT);
-        premios.setMaximumSize(new Dimension(260, 140));
-        premios.setPreferredSize(new Dimension(250, 120));
-        premios.setMinimumSize(new Dimension(240, 110));
+        premios.setMaximumSize(new Dimension(260, 320));
+        premios.setPreferredSize(new Dimension(250, 280));
+        premios.setMinimumSize(new Dimension(240, 220));
 
         JPanel tarjeta = new JPanel() {
             @Override
